@@ -23,7 +23,9 @@ extern int yyerror(std::string msg);
 [a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
 .         { yyerror("unknown char"); }
-
+"//".*    { /* DO NOTHING */ }
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
+[/][*]    { yy_fatal_error("Unterminated comment"); }
 %%
 
 std::string token_to_string(int token, const char *lexeme) {
