@@ -40,6 +40,8 @@ extern FILE* prout;
     }
     while(s[i]==' ')
         i++;
+    while(s[i]==' ')
+        i++;
     std::string value = "";
     std::string subvalue="";
 
@@ -74,6 +76,9 @@ extern FILE* prout;
         if(i.second==key){
             macro_table[i.first] = macro_table[key];
         }
+    }
+    for(auto i:macro_table){
+        if(i.first==i.second){
     }
     for(auto i:macro_table){
         if(i.first==i.second){
