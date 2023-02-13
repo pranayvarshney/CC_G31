@@ -40,8 +40,7 @@ extern FILE* prout;
     }
     while(s[i]==' ')
         i++;
-    while(s[i]==' ')
-        i++;
+
     std::string value = "";
     std::string subvalue="";
 
@@ -66,20 +65,14 @@ extern FILE* prout;
             value += subvalue;
         subvalue = "";
     }
- 
-    for(auto i:macro_table){
-        if(value.find(i.first) == std::string::npos)
-            yy_fatal_error("Syntax Error\n");
-    }
+
     macro_table[key] = value;
     for(auto i: macro_table){
         if(i.second==key){
             macro_table[i.first] = macro_table[key];
         }
     }
-    for(auto i:macro_table){
-        if(i.first==i.second){
-    }
+
     for(auto i:macro_table){
         if(i.first==i.second){
             yy_fatal_error("Error: Invalid Syntax");
