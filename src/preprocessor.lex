@@ -22,6 +22,8 @@ extern FILE* prout;
 "#undef " {BEGIN UNDEFMODE;}
 <UNDEFMODE>[a-zA-Z]+([^\n]*[\\][\n])*[^\n]*[\n] { 
     std::string s = std::string(yytext);
+    s[s.length()-1]=' ';
+    s+="\n";
     std::string key = "";
     int i=0;
     while (s[i] != ' ') {
