@@ -9,11 +9,10 @@
 #include <unordered_map>     
 #include <string>     
 #include <cstring>     
-#include <tuple>      
 
+extern int prerror(std::string msg);
 std::unordered_map<std::string, std::string> macro_table;      
  
-extern int prerror(std::string msg);
 extern FILE* prout;
 %}
 
@@ -46,8 +45,16 @@ extern FILE* prout;
         value += s[i];
         i++;
     }
-
     macro_table[key] = value;
+    for(auto i: macro_table){
+        if(i.second==key){
+            macro_table[i.first] = macro_table[key];
+            
+        }
+        if(macro_table[i.first]==macro_table[i.second]){
+            yy_fatal_error("Error: Invalid Syntax");
+        }
+    }
     BEGIN INITIAL;
 }
 %%
