@@ -1,3 +1,2 @@
-#def abc 12
-#undef abc
-dbg abc;
+#def a 5 //lol
+dbg a;
