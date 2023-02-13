@@ -1,2 +1,2 @@
-#def NOBODY 
-dbg NOBODY;
+#def a 5 //lol
+dbg a;

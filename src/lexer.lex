@@ -1,5 +1,7 @@
 /* %option prefix="yy" */
 %option noyywrap
+%x SCOMMENT
+%x MCOMMENT
 
 %{
 #include "parser.hh"
@@ -31,9 +33,11 @@ extern int yyerror(std::string msg);
 [a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
 .         { yyerror("unknown char"); }
-"//".*    { /* DO NOTHING */ }
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
-[/][*]    { yy_fatal_error("Unterminated comment"); }
+"//"[^\n]*  { BEGIN (SCOMMENT);}
+<SCOMMENT>[ \n]+ {BEGIN (INITIAL);} 
+"/*"  { BEGIN(MCOMMENT); }
+<MCOMMENT>[^*]*[*]+([^*/][^*]*[*]+)*[/]  {BEGIN(INITIAL);}
+<MCOMMENT>.  {yy_fatal_error("Unterminated comment");}
 
 %%
  
