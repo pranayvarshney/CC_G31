@@ -70,44 +70,46 @@ int main(int argc, char *argv[]) {
 	prlex();
 	fclose(prout);
 	fclose(prin);
-	return 0;
-	// if (arg_option == ARG_OPTION_L) {
-	// 	extern std::string token_to_string(int token, const char *lexeme);
 
-	// 	while (true) {
-	// 		int token = yylex();
-	// 		if (token == 0) {
-	// 			break;
-	// 		}
+	yyin = fopen("output.be","r");
 
-	// 		std::cout << token_to_string(token, yytext) << "\n";
-	// 	}
-	// 	fclose(yyin);
-	// 	return 0;
-	// }
+	if (arg_option == ARG_OPTION_L) {
+		extern std::string token_to_string(int token, const char *lexeme);
 
-    // final_values = nullptr;
-	// yyparse();
+		while (true) {
+			int token = yylex();
+			if (token == 0) {
+				break;
+			}
 
-	// fclose(yyin);
+			std::cout << token_to_string(token, yytext) << "\n";
+		}
+		fclose(yyin);
+		return 0;
+	}
 
-	// if(final_values) {
-	// 	if (arg_option == ARG_OPTION_P) {
-	// 		std::cout << final_values->to_string() << std::endl;
-	// 		return 0;
-	// 	}
+    final_values = nullptr;
+	yyparse();
+
+	fclose(yyin);
+
+	if(final_values) {
+		if (arg_option == ARG_OPTION_P) {
+			std::cout << final_values->to_string() << std::endl;
+			return 0;
+		}
 		
-    //     llvm::LLVMContext context;
-	// 	LLVMCompiler compiler(&context, "base");
-	// 	compiler.compile(final_values);
-    //     if (arg_option == ARG_OPTION_S) {
-	// 		compiler.dump();
-    //     } else {
-    //         compiler.write(std::string(argv[3]));
-	// 	}
-	// } else {
-	//  	std::cerr << "empty program";
-	// }
+        llvm::LLVMContext context;
+		LLVMCompiler compiler(&context, "base");
+		compiler.compile(final_values);
+        if (arg_option == ARG_OPTION_S) {
+			compiler.dump();
+        } else {
+            compiler.write(std::string(argv[3]));
+		}
+	} else {
+	 	std::cerr << "empty program";
+	}
 
     return 0;
 }
