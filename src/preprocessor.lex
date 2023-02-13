@@ -1,6 +1,7 @@
 %option prefix="pr"
 %option noyywrap
 %x DEFMODE
+%x UNDEFMODE
 
 %{
 #include "parser.hh"
@@ -18,16 +19,19 @@ extern FILE* prout;
 
 %%
 
+"#undef " {BEGIN UNDEFMODE;}
+<UNDEFMODE>[a-zA-Z]+([^\n]*[\\][\n])*[^\n]*[\n] { 
+    std::string s = std::string(yytext);
+    std::string key = "";
+    int i=0;
+    while (s[i] != ' ') {
+        key += s[i];
+        i++;
+    }
+    macro_table.erase(key);
+    BEGIN INITIAL;
+}
 
-[a-zA-Z]+  {
-                if(macro_table.find(prtext)!=macro_table.end()){
-                    fprintf(prout,"%s",macro_table[prtext].c_str());
-                }
-                else
-                {
-                    fprintf(prout,"%s",prtext);
-                }
-            }
 "#def " { BEGIN DEFMODE;}
 <DEFMODE>[a-zA-Z]+[ A-Za-z0-9]*([^\n]*[\\][\n])*[^\n]*[\n] {
 
@@ -80,4 +84,13 @@ extern FILE* prout;
     }
     BEGIN INITIAL;
 }
+[a-zA-Z]+  {
+                if(macro_table.find(prtext)!=macro_table.end()){
+                    fprintf(prout,"%s",macro_table[prtext].c_str());
+                }
+                else
+                {
+                    fprintf(prout,"%s",prtext);
+                }
+            }
 %%
