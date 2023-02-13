@@ -1,4 +1,3 @@
-#def a b
-#def b a
-
-dbg 12;
+#def ABC 3
+#undef ABC 
+dbg ABC;
