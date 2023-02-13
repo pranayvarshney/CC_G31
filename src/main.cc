@@ -4,13 +4,14 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <stdio.h>
 
 #include "parser.hh"
 #include "ast.hh"
 #include "llvmcodegen.hh"
 
-extern FILE *yyin;
-extern int yylex();
+extern FILE *yyin,*prin,*prout;
+extern int yylex(),prlex(),yyrestart();
 extern char *yytext;
 
 NodeStmts *final_values;
@@ -63,8 +64,17 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-	yyin = source;
+	prin = source;
 
+	while (true)
+	{
+		int token=prlex();
+		if(token==0)
+			break;
+	}
+
+	fclose(prin);
+	// return 0;
 	if (arg_option == ARG_OPTION_L) {
 		extern std::string token_to_string(int token, const char *lexeme);
 

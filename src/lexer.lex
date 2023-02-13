@@ -1,14 +1,22 @@
+/* %option prefix="yy" */
 %option noyywrap
 
 %{
 #include "parser.hh"
 #include <string>
-
+#include <unordered_map>     
+#include <string>     
+#include <cstring>     
+#include <tuple>      
+ 
+std::pair<std::string, std::string> tokenise(char* yytext);
+ 
 extern int yyerror(std::string msg);
+ 
 %}
 
 %%
-
+ 
 "+"       { return TPLUS; }
 "-"       { return TDASH; }
 "*"       { return TSTAR; }
@@ -26,8 +34,9 @@ extern int yyerror(std::string msg);
 "//".*    { /* DO NOTHING */ }
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
 [/][*]    { yy_fatal_error("Unterminated comment"); }
-%%
 
+%%
+ 
 std::string token_to_string(int token, const char *lexeme) {
     std::string s;
     switch (token) {
@@ -46,6 +55,6 @@ std::string token_to_string(int token, const char *lexeme) {
         case TINT_LIT: s = "TINT_LIT"; s.append("  ").append(lexeme); break;
         case TIDENT: s = "TIDENT"; s.append("  ").append(lexeme); break;
     }
-
+ 
     return s;
 }
