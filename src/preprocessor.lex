@@ -38,20 +38,45 @@ extern FILE* prout;
         key += s[i];
         i++;
     }
-    
-    std::string value = "";
-    i++;
-    while (s[i] != '\n') {
-        value += s[i];
+    while(s[i]==' ')
         i++;
+    std::string value = "";
+    std::string subvalue="";
+
+    for(;i<(int)s.size();i++){
+        if(!((s[i] >= 'a' and s[i] <= 'z') or (s[i] >= 'A' and s[i] <= 'Z'))){
+            if(subvalue.size() > 0){
+                if(macro_table.find(subvalue) != macro_table.end())
+                    value += macro_table[subvalue];
+                else
+                    value += subvalue;
+                subvalue = "";
+            }
+            value += s[i];
+        }
+        else
+            subvalue += s[i];
+    }
+    if(subvalue.size() > 0){
+        if(macro_table.find(subvalue) != macro_table.end())
+            value += macro_table[subvalue];
+        else
+            value += subvalue;
+        subvalue = "";
+    }
+ 
+    for(auto i:macro_table){
+        if(value.find(i.first) == std::string::npos)
+            yy_fatal_error("Syntax Error\n");
     }
     macro_table[key] = value;
     for(auto i: macro_table){
         if(i.second==key){
             macro_table[i.first] = macro_table[key];
-            
         }
-        if(macro_table[i.first]==macro_table[i.second]){
+    }
+    for(auto i:macro_table){
+        if(i.first==i.second){
             yy_fatal_error("Error: Invalid Syntax");
         }
     }
