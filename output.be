@@ -1,2 +1,4 @@
-dbg  5 //lol
-;
+let x=5;
+
+
+dbg 2*x;
