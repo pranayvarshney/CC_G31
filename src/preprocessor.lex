@@ -21,13 +21,13 @@
 #include <string>     
 #include <cstring>     
 
-extern int prerror(std::string msg);
-void addValueWithCheck();
-std::unordered_map<std::string, std::string> macro_table;   
-std::string ident;  
-std::string s; 
- 
-extern FILE* prout;
+    extern int prerror(std::string msg);
+    void addValueWithCheck();
+    std::unordered_map<std::string, std::string> macro_table;   
+    std::string ident;  
+    std::string s; 
+    
+    extern FILE* prout;
 %}
 
 %%
@@ -44,11 +44,13 @@ extern FILE* prout;
     macro_table[ident] = "";
     BEGIN(DEFMODE);
 }
+
 "#ifdef " {BEGIN(IFDEFIDENT);}
 <IFDEFIDENT>[a-zA-Z0-9]+ {
     ident =  std::string(yytext);
     BEGIN(IFDEFMODE);
 }
+
 <IFDEFMODE>.*"\n#endif" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -58,6 +60,7 @@ extern FILE* prout;
     }
     BEGIN(INITIAL);
 }
+
 <IFDEFMODE>.*"\n#elif " {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -68,6 +71,7 @@ extern FILE* prout;
     }
     BEGIN(ELIFIDENT);
 }
+
 <IFDEFMODE>.*"\n#else" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -78,10 +82,12 @@ extern FILE* prout;
     }
     BEGIN(ELSEMODE);
 }
+
 <ELIFIDENT>[a-zA-Z0-9]+ {
     ident =  std::string(yytext);
     BEGIN(ELIFMODE);
 }
+
 <ELIFMODE>.*"\n#endif" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -91,6 +97,7 @@ extern FILE* prout;
     }
     BEGIN(INITIAL);
 }
+
 <ELIFMODE>.*"\n#elif " {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -101,6 +108,7 @@ extern FILE* prout;
     }
     BEGIN(ELIFIDENT);
 }
+
 <ELIFMODE>.*"\n#else" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
@@ -111,12 +119,14 @@ extern FILE* prout;
     }
     BEGIN(ELSEMODE);
 }
+
 <ELSEMODE>.*"\n#endif" {
     std::string l = std::string(prtext);
     int len = l.size();
     l[len-6] = 0;
     fprintf(prout,"%s",l.c_str());
 }
+
 <SKIPMODE>.*"\n#endif" { }
 
 <DEFMODE>[^\\\n]+[\n] {
@@ -126,7 +136,6 @@ extern FILE* prout;
     BEGIN(INITIAL);
 
 }
-
 
 <DEFMODE2>[^\\\n]+[\\][\n] {
     s = std::string(yytext);
@@ -150,20 +159,21 @@ extern FILE* prout;
     BEGIN INITIAL;
 }
 
-
 <DEFMODE>[ ]*[\n]* {
     macro_table[ident] = "1";
     BEGIN(INITIAL);
 }
+
 [a-zA-Z0-9]+  {
-                if(macro_table.find(prtext)!=macro_table.end()){
-                    fprintf(prout,"%s",macro_table[prtext].c_str());
-                }
-                else
-                {
-                    fprintf(prout,"%s",prtext);
-                }
-            }
+    if(macro_table.find(prtext)!=macro_table.end()){
+        fprintf(prout,"%s",macro_table[prtext].c_str());
+    }
+    else
+    {
+        fprintf(prout,"%s",prtext);
+    }
+}
+
 "//"[^\n]*  { BEGIN (SCOMMENT);}
 <SCOMMENT>[ \n]+ {BEGIN (INITIAL);} 
 "/*"  { BEGIN(MCOMMENT); }
