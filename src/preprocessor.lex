@@ -117,7 +117,7 @@ extern FILE* prout;
     l[len-6] = 0;
     fprintf(prout,"%s",l.c_str());
 }
-<SKIPMODE>.*"\#endif" { }
+<SKIPMODE>.*"\n#endif" { }
 
 <DEFMODE>[^\\\n]+[\n] {
     s = std::string(yytext);
@@ -155,7 +155,7 @@ extern FILE* prout;
     macro_table[ident] = "1";
     BEGIN(INITIAL);
 }
-[a-zA-Z]+  {
+[a-zA-Z0-9]+  {
                 if(macro_table.find(prtext)!=macro_table.end()){
                     fprintf(prout,"%s",macro_table[prtext].c_str());
                 }
