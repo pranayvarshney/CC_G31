@@ -23,6 +23,7 @@
 
     extern int prerror(std::string msg);
     void addValueWithCheck();
+    std::string modIdent(std::string l);
     std::unordered_map<std::string, std::string> macro_table;   
     std::string ident;  
     std::string s; 
@@ -65,7 +66,7 @@
         std::string l = std::string(prtext);
         int len = l.size();
         l[len-1] = 0;
-        fprintf(prout,"%s",l.c_str());
+        fprintf(prout,"%s",modIdent(l).c_str());
         BEGIN(SKIPMODE);
     }
     else{
@@ -78,7 +79,7 @@
         std::string l = std::string(prtext);
         int len = l.size();
         l[len-1] = 0;
-        fprintf(prout,"%s",l.c_str());
+        fprintf(prout,"%s",modIdent(l).c_str());
         BEGIN(SKIPMODE);
     }
     else{
@@ -90,7 +91,7 @@
     std::string l = std::string(prtext);
     int len = l.size();
     l[len-1] = 0;
-    fprintf(prout,"%s",l.c_str());
+    fprintf(prout,"%s",modIdent(l).c_str());
     BEGIN(SKIPMODE);
 }
 
@@ -153,7 +154,7 @@ void addValueWithCheck(){
     std::string subvalue="";
     int start = 0;
     for(;start<(int)s.size();start++){
-        if(!((s[start] >= 'a' and s[start] <= 'z') or (s[start] >= 'A' and s[start] <= 'Z'))){
+        if(!((s[start] >= 'a' and s[start] <= 'z') or (s[start] >= 'A' and s[start] <= 'Z')) and !(s[start]>='0' and s[start]<='9')){
             if(subvalue.size() > 0){
                 if(macro_table.find(subvalue) != macro_table.end())
                     value += macro_table[subvalue];
@@ -188,4 +189,31 @@ void addValueWithCheck(){
     }
 }
 
+std::string modIdent(std::string l){
+    std::string value = "";
+    std::string subvalue="";
+    int start = 0;
+    for(;start<(int)s.size();start++){
+        if(!((l[start] >= 'a' and l[start] <= 'z') or (l[start] >= 'A' and l[start] <= 'Z')) and !(l[start]>='0' and l[start]<='9')){
+            if(subvalue.size() > 0){
+                if(macro_table.find(subvalue) != macro_table.end())
+                    value += macro_table[subvalue];
+                else
+                     value += subvalue;
+                subvalue = "";
+            }
+            value += l[start];
+        }
+        else
+            subvalue += l[start];
+    }
+    if(subvalue.size() > 0){
+        if(macro_table.find(subvalue) != macro_table.end())
+            value += macro_table[subvalue];
+        else
+            value += subvalue;
+        subvalue = "";
+    }
+    return value;
+}
 
