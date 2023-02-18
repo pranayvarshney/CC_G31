@@ -1,2 +1,3 @@
-dbg  4
-;
+let x = 5;
+
+dbg DEBUG;

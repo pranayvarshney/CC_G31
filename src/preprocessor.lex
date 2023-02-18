@@ -6,12 +6,12 @@
 %x SCOMMENT
 %x MCOMMENT
 %x DEFMODE2
+%x SKIPMODE
 %x IFDEFIDENT
 %x IFDEFMODE
 %x ELIFIDENT
 %x ELIFMODE
 %x ELSEMODE
-%x SKIPMODE
 
 %{
 #include "parser.hh"
@@ -44,90 +44,55 @@
     macro_table[ident] = "";
     BEGIN(DEFMODE);
 }
+<SKIPMODE>(.*["\n"]*)*"endif" { }
 
 "#ifdef " {BEGIN(IFDEFIDENT);}
+"elif "   {BEGIN(ELIFIDENT);}
+"else"    {BEGIN(ELSEMODE);}
+"endif"   {}
+
 <IFDEFIDENT>[a-zA-Z0-9]+ {
     ident =  std::string(yytext);
     BEGIN(IFDEFMODE);
 }
-
-<IFDEFMODE>.*"\n#endif" {
-    if(macro_table.find(ident)!=macro_table.end()){
-        std::string l = std::string(prtext);
-        int len = l.size();
-        l[len-6] = 0;
-        fprintf(prout,"%s",l.c_str());
-    }
-    BEGIN(INITIAL);
-}
-
-<IFDEFMODE>.*"\n#elif " {
-    if(macro_table.find(ident)!=macro_table.end()){
-        std::string l = std::string(prtext);
-        int len = l.size();
-        l[len-6] = 0;
-        fprintf(prout,"%s",l.c_str());
-        BEGIN(SKIPMODE);
-    }
-    BEGIN(ELIFIDENT);
-}
-
-<IFDEFMODE>.*"\n#else" {
-    if(macro_table.find(ident)!=macro_table.end()){
-        std::string l = std::string(prtext);
-        int len = l.size();
-        l[len-5] = 0;
-        fprintf(prout,"%s",l.c_str());
-        BEGIN(SKIPMODE);
-    }
-    BEGIN(ELSEMODE);
-}
-
 <ELIFIDENT>[a-zA-Z0-9]+ {
     ident =  std::string(yytext);
     BEGIN(ELIFMODE);
 }
 
-<ELIFMODE>.*"\n#endif" {
+<IFDEFMODE>([^#]*["\n"]*)*"#" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
         int len = l.size();
-        l[len-6] = 0;
-        fprintf(prout,"%s",l.c_str());
-    }
-    BEGIN(INITIAL);
-}
-
-<ELIFMODE>.*"\n#elif " {
-    if(macro_table.find(ident)!=macro_table.end()){
-        std::string l = std::string(prtext);
-        int len = l.size();
-        l[len-6] = 0;
+        l[len-1] = 0;
         fprintf(prout,"%s",l.c_str());
         BEGIN(SKIPMODE);
     }
-    BEGIN(ELIFIDENT);
+    else{
+        BEGIN(INITIAL);
+    }
 }
 
-<ELIFMODE>.*"\n#else" {
+<ELIFMODE>([^#]*["\n"]*)*"#" {
     if(macro_table.find(ident)!=macro_table.end()){
         std::string l = std::string(prtext);
         int len = l.size();
-        l[len-5] = 0;
+        l[len-1] = 0;
         fprintf(prout,"%s",l.c_str());
         BEGIN(SKIPMODE);
     }
-    BEGIN(ELSEMODE);
+    else{
+        BEGIN(INITIAL);
+    }
 }
 
-<ELSEMODE>.*"\n#endif" {
+<ELSEMODE>([^#]*["\n"]*)*"#" {
     std::string l = std::string(prtext);
     int len = l.size();
-    l[len-6] = 0;
+    l[len-1] = 0;
     fprintf(prout,"%s",l.c_str());
+    BEGIN(SKIPMODE);
 }
-
-<SKIPMODE>.*"\n#endif" { }
 
 <DEFMODE>[^\\\n]+[\n] {
     s = std::string(yytext);
@@ -222,3 +187,5 @@ void addValueWithCheck(){
         }
     }
 }
+
+

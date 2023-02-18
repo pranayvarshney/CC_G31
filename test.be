@@ -1,2 +1,5 @@
-#def DEBUG2 4
-dbg DEBUG2;
+#def DEBUG 10
+let x = 5;
+#ifdef DEBUG
+dbg DEBUG;
+#endif
