@@ -193,7 +193,7 @@ std::string modIdent(std::string l){
     std::string value = "";
     std::string subvalue="";
     int start = 0;
-    for(;start<(int)s.size();start++){
+    for(;start<(int)l.size();start++){
         if(!((l[start] >= 'a' and l[start] <= 'z') or (l[start] >= 'A' and l[start] <= 'Z')) and !(l[start]>='0' and l[start]<='9')){
             if(subvalue.size() > 0){
                 if(macro_table.find(subvalue) != macro_table.end())
@@ -216,4 +216,3 @@ std::string modIdent(std::string l){
     }
     return value;
 }
-
