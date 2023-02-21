@@ -79,8 +79,8 @@ void LLVMCompiler::write(std::string file_name) {
 }
 
 //  ┌―――――――――――――――――――――┐  //
-//  │ AST -> LLVM Codegen │  //
-// └―――――――――――――――――――――┘   //
+//  │ AST -> LLVM Codegen   │  //
+//  └―――――――――――――――――――――┘  //
 
 // codegen for statements
 Value *NodeStmts::llvm_codegen(LLVMCompiler *compiler) {
@@ -122,7 +122,7 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler) {
 }
 
 
-Value *NodeAssn::llvm_codegen(LLVMCompiler *compiler) {
+Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler) {
     Value *expr = expression->llvm_codegen(compiler);
 
     IRBuilder<> temp_builder(
