@@ -32,7 +32,7 @@ NodeTernary::NodeTernary(Node *conditionptr, Node *leftptr, Node *rightptr) {
 }
 
 std::string NodeTernary::to_string() {
-    std::string out = "( ? : " + condition->to_string() + ' ' + left->to_string() + ' ' + right->to_string() + ')';
+    std::string out = "(?: " + condition->to_string() + ' ' + left->to_string() + ' ' + right->to_string() + ')';
     return out;
 }
 
