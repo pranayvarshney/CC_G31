@@ -120,7 +120,9 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler) {
         return compiler->builder.CreateSDiv(left_expr, right_expr, "divtmp");
     }
 }
-
+Value *NodeTernary::llvm_codegen(LLVMCompiler *compiler) {
+    return nullptr;
+}
 
 Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler) {
     Value *expr = expression->llvm_codegen(compiler);
