@@ -46,6 +46,9 @@ struct NodeBinOp : public Node {
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
+/**
+    Node for ternary expressions
+*/
 struct NodeTernary : public Node {
     Node *condition, *left, *right;
 
