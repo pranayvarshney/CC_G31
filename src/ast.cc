@@ -24,18 +24,6 @@ std::string NodeBinOp::to_string() {
     return out;
 }
 
-NodeTernary::NodeTernary(Node *conditionptr, Node *leftptr, Node *rightptr) {
-    type = TERNARY;
-    condition = conditionptr;
-    left = leftptr;
-    right = rightptr;
-}
-
-std::string NodeTernary::to_string() {
-    std::string out = "(?: " + condition->to_string() + ' ' + left->to_string() + ' ' + right->to_string() + ')';
-    return out;
-}
-
 NodeInt::NodeInt(int val) {
     type = INT_LIT;
     value = val;
@@ -65,17 +53,14 @@ std::string NodeStmts::to_string() {
     return out;
 }
 
-NodeDecl::NodeDecl(NodeType AssignType, std::string id, Node *expr) {
-    type = AssignType;
+NodeDecl::NodeDecl(std::string id, Node *expr) {
+    type = ASSN;
     identifier = id;
     expression = expr;
 }
 
 std::string NodeDecl::to_string() {
-    if(type == ASSN)
-        return "(let " + identifier + " " + expression->to_string() + ")";
-    else if(type == REASSN)
-        return "(assign " + identifier + " " + expression->to_string() + ")";
+    return "(let " + identifier + " " + expression->to_string() + ")";
 }
 
 NodeDebug::NodeDebug(Node *expr) {

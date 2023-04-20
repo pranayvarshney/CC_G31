@@ -25,12 +25,12 @@ int yyerror(std::string msg);
 
 }
 
-%token TPLUS TDASH TSTAR TSLASH TCOLON TQUESTION
+%token TPLUS TDASH TSTAR TSLASH
 %token <lexeme> TINT_LIT TIDENT
 %token INT TLET TDBG
 %token TSCOL TLPAREN TRPAREN TEQUAL
 
-%type <node> Expr Stmt Ternary
+%type <node> Expr Stmt
 %type <stmts> Program StmtList
 
 %left TPLUS TDASH
@@ -58,25 +58,14 @@ Stmt : TLET TIDENT TEQUAL Expr
         } else {
             symbol_table.insert($2);
 
-            $$ = new NodeDecl(Node::ASSN, $2, $4);
+            $$ = new NodeDecl($2, $4);
         }
      }
      | TDBG Expr
      { 
         $$ = new NodeDebug($2);
      }
-     | TIDENT TEQUAL Expr
-    {
-        if(symbol_table.contains($1)) {
-            $$ = new NodeDecl(Node::REASSN, $1, $3);
-        } else {
-            yyerror("tried to assign to undeclared variable.\n");
-        }
-    }
      ;
-
-Ternary : Expr TQUESTION Expr TCOLON Expr
-     { $$ = new NodeTernary($1, $3, $5); };
 
 Expr : TINT_LIT               
      { $$ = new NodeInt(stoi($1)); }
@@ -96,7 +85,6 @@ Expr : TINT_LIT
      | Expr TSLASH Expr
      { $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3); }
      | TLPAREN Expr TRPAREN { $$ = $2; }
-     | Ternary
      ;
 
 %%

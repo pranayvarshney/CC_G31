@@ -1,24 +1,14 @@
-/* %option prefix="yy" */
 %option noyywrap
-%x SCOMMENT
-%x MCOMMENT
 
 %{
 #include "parser.hh"
 #include <string>
-#include <unordered_map>     
-#include <string>     
-#include <cstring>     
-#include <tuple>      
- 
-std::pair<std::string, std::string> tokenise(char* yytext);
- 
+
 extern int yyerror(std::string msg);
- 
 %}
 
 %%
- 
+
 "+"       { return TPLUS; }
 "-"       { return TDASH; }
 "*"       { return TSTAR; }
@@ -27,22 +17,15 @@ extern int yyerror(std::string msg);
 "("       { return TLPAREN; }
 ")"       { return TRPAREN; }
 "="       { return TEQUAL; }
-"?"       { return TQUESTION; }
-":"       { return TCOLON; }
 "dbg"     { return TDBG; }
 "let"     { return TLET; }
 [0-9]+    { yylval.lexeme = std::string(yytext); return TINT_LIT; }
 [a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
 .         { yyerror("unknown char"); }
-"//"[^\n]*  { BEGIN (SCOMMENT);}
-<SCOMMENT>[ \n]+ {BEGIN (INITIAL);} 
-"/*"  { BEGIN(MCOMMENT); }
-<MCOMMENT>[^*]*[*]+([^*/][^*]*[*]+)*[/]  {BEGIN(INITIAL);}
-<MCOMMENT>.  {yy_fatal_error("Unterminated comment");}
 
 %%
- 
+
 std::string token_to_string(int token, const char *lexeme) {
     std::string s;
     switch (token) {
@@ -54,9 +37,6 @@ std::string token_to_string(int token, const char *lexeme) {
         case TLPAREN: s = "TLPAREN"; break;
         case TRPAREN: s = "TRPAREN"; break;
         case TEQUAL: s = "TEQUAL"; break;
-
-        case TQUESTION: s = "TQUESTION"; break;
-        case TCOLON: s = "TCOLON"; break;
         
         case TDBG: s = "TDBG"; break;
         case TLET: s = "TLET"; break;
@@ -64,6 +44,6 @@ std::string token_to_string(int token, const char *lexeme) {
         case TINT_LIT: s = "TINT_LIT"; s.append("  ").append(lexeme); break;
         case TIDENT: s = "TIDENT"; s.append("  ").append(lexeme); break;
     }
- 
+
     return s;
 }

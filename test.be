@@ -1,5 +1,2 @@
-let a = 5;
-let c = 3;
-let b = 2;
-a = b + c;
-a = a ? b : c;
+let abc = 123 * 20 + 20 + (22 / 2) - 3;
+dbg abc + abc;

@@ -79,8 +79,8 @@ void LLVMCompiler::write(std::string file_name) {
 }
 
 //  ┌―――――――――――――――――――――┐  //
-//  │ AST -> LLVM Codegen   │  //
-//  └―――――――――――――――――――――┘  //
+//  │ AST -> LLVM Codegen │  //
+// └―――――――――――――――――――――┘   //
 
 // codegen for statements
 Value *NodeStmts::llvm_codegen(LLVMCompiler *compiler) {
@@ -120,9 +120,7 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler) {
         return compiler->builder.CreateSDiv(left_expr, right_expr, "divtmp");
     }
 }
-Value *NodeTernary::llvm_codegen(LLVMCompiler *compiler) {
-    return nullptr;
-}
+
 
 Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler) {
     Value *expr = expression->llvm_codegen(compiler);
