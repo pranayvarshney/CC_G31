@@ -53,8 +53,9 @@ std::string NodeStmts::to_string() {
     return out;
 }
 
-NodeDecl::NodeDecl(std::string id, Node *expr) {
+NodeDecl::NodeDecl(std::string id, int t, Node *expr) {
     type = ASSN;
+    dtype = t;
     identifier = id;
     expression = expr;
 }

@@ -1,17 +1,18 @@
 #ifndef SYMBOL_HH
 #define SYMBOL_HH
 
-#include <set>
+#include <unordered_map>
 #include <string>
+#include <utility>
 #include "ast.hh"
 
 
 // Basic symbol table, just keeping track of prior existence and nothing else
 struct SymbolTable {
-    std::set<std::string> table;
+    std::unordered_map<std::string, int> table;
 
     bool contains(std::string key);
-    void insert(std::string key);
+    void insert(std::string key, int type);
 };
 
 #endif

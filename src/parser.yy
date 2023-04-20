@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "parser_util.hh"
 #include "symbol.hh"
@@ -20,13 +21,18 @@ extern int yyparse();
 extern NodeStmts* final_values;
 
 SymbolTable symbol_table;
+std::unordered_map<std::string, int> type_table = {
+    {"int", 1},
+    {"double", 2},
+    {"short", 0}
+};
 
 int yyerror(std::string msg);
 
 }
 
-%token TPLUS TDASH TSTAR TSLASH
-%token <lexeme> TINT_LIT TIDENT
+%token TPLUS TDASH TSTAR TSLASH TCOLON
+%token <lexeme> TINT_LIT TTYPE TIDENT
 %token INT TLET TDBG
 %token TSCOL TLPAREN TRPAREN TEQUAL
 
@@ -50,15 +56,15 @@ StmtList : Stmt
          { $$->push_back($3); }
 	     ;
 
-Stmt : TLET TIDENT TEQUAL Expr
+Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      {
-        if(symbol_table.contains($2)) {
+        if(symbol_table.contains($4)) {
             // tried to redeclare variable, so error
             yyerror("tried to redeclare variable.\n");
         } else {
-            symbol_table.insert($2);
+            symbol_table.insert($2, type_table[$4]);
 
-            $$ = new NodeDecl($2, $4);
+            $$ = new NodeDecl($2, type_table[$4], $6);
         }
      }
      | TDBG Expr
