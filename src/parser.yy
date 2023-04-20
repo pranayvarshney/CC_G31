@@ -83,15 +83,44 @@ Expr : TINT_LIT
             yyerror("using undeclared variable.\n");
      }
      | Expr TPLUS Expr
-     { $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3); }
+     { 
+        if($1->isIntLit() && $3->isIntLit()) {
+            int val = dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue();
+            $$ = new NodeInt(val);
+        } else {
+            $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3);
+        }
+     }
      | Expr TDASH Expr
-     { $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3); }
+     { 
+        if($1->isIntLit() && $3->isIntLit()) {
+            int val = dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue();
+            $$ = new NodeInt(val);
+        } else {
+            $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3);
+        }
+     }
      | Expr TSTAR Expr
-     { $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3); }
+     { 
+        if($1->isIntLit() && $3->isIntLit()) {
+            int val = dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue();
+            $$ = new NodeInt(val);
+        } else {
+            $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3);
+        }
+     }
      | Expr TSLASH Expr
-     { $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3); }
+     { 
+        if($1->isIntLit() && $3->isIntLit()) {
+            int val = dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue();
+            $$ = new NodeInt(val);
+        } else {
+            $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3);
+        }
+     }
      | TLPAREN Expr TRPAREN { $$ = $2; }
      ;
+
 
 %%
 

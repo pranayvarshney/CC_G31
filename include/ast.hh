@@ -15,6 +15,8 @@ struct Node {
         BIN_OP, INT_LIT, STMTS, ASSN, DBG, IDENT
     } type;
 
+    virtual bool isIntLit() const { return false; }
+    virtual bool isIdent() const { return false; }
     virtual std::string to_string() = 0;
     virtual llvm::Value *llvm_codegen(LLVMCompiler *compiler) = 0;
 };
@@ -54,6 +56,8 @@ struct NodeInt : public Node {
 
     NodeInt(int val);
     std::string to_string();
+    int getValue() const { return value; }
+    virtual bool isIntLit() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
@@ -88,6 +92,7 @@ struct NodeIdent : public Node {
 
     NodeIdent(std::string ident);
     std::string to_string();
+    virtual bool isIdent() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
