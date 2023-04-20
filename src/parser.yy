@@ -23,7 +23,7 @@ extern NodeStmts* final_values;
 SymbolTable symbol_table;
 std::unordered_map<std::string, int> type_table = {
     {"int", 1},
-    {"double", 2},
+    {"long", 2},
     {"short", 0}
 };
 
@@ -58,13 +58,12 @@ StmtList : Stmt
 
 Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      {
-        if(symbol_table.contains($4)) {
+        if(symbol_table.contains($2)) {
             // tried to redeclare variable, so error
             yyerror("tried to redeclare variable.\n");
         } else {
             symbol_table.insert($2, type_table[$4]);
-
-            $$ = new NodeDecl($2, type_table[$4], $6);
+            $$ = new NodeDecl($2, type_table[$4], $6);  
         }
      }
      | TDBG Expr
@@ -74,7 +73,7 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      ;
 
 Expr : TINT_LIT               
-     { $$ = new NodeInt(stoi($1)); }
+     { $$ = new NodeInt(std::stoll($1)); }
      | TIDENT
      { 
         if(symbol_table.contains($1))

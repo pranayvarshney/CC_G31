@@ -15,9 +15,14 @@ struct Node {
         BIN_OP, INT_LIT, STMTS, ASSN, DBG, IDENT
     } type;
 
+    int dtype;
     virtual std::string to_string() = 0;
     virtual llvm::Value *llvm_codegen(LLVMCompiler *compiler) = 0;
+    std::string nameOfVariable;
+    virtual int get_type();
 };
+
+
 
 /**
     Node for list of statements
@@ -43,6 +48,7 @@ struct NodeBinOp : public Node {
 
     NodeBinOp(Op op, Node *leftptr, Node *rightptr);
     std::string to_string();
+    int get_type();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
@@ -50,11 +56,12 @@ struct NodeBinOp : public Node {
     Node for integer literals
 */
 struct NodeInt : public Node {
-    int value;
+    long long int value;
 
-    NodeInt(int val);
+    NodeInt(long long int val);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+    int get_type();
 };
 
 /**
@@ -63,7 +70,6 @@ struct NodeInt : public Node {
 struct NodeDecl : public Node {
     std::string identifier;
     Node *expression;
-    int dtype;
     NodeDecl(std::string id, int t, Node *expr);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
@@ -89,6 +95,7 @@ struct NodeIdent : public Node {
     NodeIdent(std::string ident);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+    int get_type();
 };
 
 #endif

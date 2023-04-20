@@ -1,2 +1,2 @@
-let abc : double = 123 * 20 + 20 + (22 / 2) - 3;
-dbg abc + abc;
+let abc : int = 2+2+23*6-5;
+dbg abc ;

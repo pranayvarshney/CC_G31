@@ -20,7 +20,7 @@ extern int yyerror(std::string msg);
 "dbg"     { return TDBG; }
 "let"     { return TLET; }
 ":"        { return TCOLON; }
-"int"|"double"|"short"       { yylval.lexeme = std::string(yytext); return TTYPE; }
+"int"|"long"|"short"       { yylval.lexeme = std::string(yytext); return TTYPE; }
 [0-9]+    { yylval.lexeme = std::string(yytext); return TINT_LIT; }
 [a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
