@@ -1,2 +1,2 @@
-let abc : int = 2+2+23*6-5;
-dbg abc ;
+let kmk : int  = 101+ 5 + 5 + 54*88;
+dbg kmk;

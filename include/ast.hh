@@ -16,6 +16,8 @@ struct Node {
     } type;
 
     int dtype;
+    virtual bool isIntLit() const { return false; }
+    virtual bool isIdent() const { return false; }
     virtual std::string to_string() = 0;
     virtual llvm::Value *llvm_codegen(LLVMCompiler *compiler) = 0;
     std::string nameOfVariable;
@@ -60,6 +62,8 @@ struct NodeInt : public Node {
 
     NodeInt(long long int val);
     std::string to_string();
+    int getValue() const { return value; }
+    virtual bool isIntLit() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
     int get_type();
 };
@@ -94,6 +98,7 @@ struct NodeIdent : public Node {
 
     NodeIdent(std::string ident);
     std::string to_string();
+    virtual bool isIdent() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
     int get_type();
 };
