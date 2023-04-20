@@ -36,6 +36,20 @@ std::string NodeTernary::to_string() {
     return out;
 }
 
+NodeIf::NodeIf(Node *conditionptr, Node *ifbranch, Node *elsebranch) {
+    type = IF;
+    condition = conditionptr;
+    if_branch = ifbranch;
+    else_branch = elsebranch;
+}
+std::string NodeIf::to_string() {
+    // std::string out = "(if " + condition->to_string() + ' ' + if_branch->to_string();
+    std::string out = "this is if";
+    //     out += ' ' + else_branch->to_string();
+    // out += ')';
+    return out;
+}
+
 NodeInt::NodeInt(int val) {
     type = INT_LIT;
     value = val;

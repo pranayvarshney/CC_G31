@@ -25,13 +25,14 @@ int yyerror(std::string msg);
 
 }
 
-%token TPLUS TDASH TSTAR TSLASH TCOLON TQUESTION
+%token TPLUS TDASH TSTAR TSLASH LBRACE RBRACE TCOLON TQUESTION
 %token <lexeme> TINT_LIT TIDENT
 %token INT TLET TDBG
 %token TSCOL TLPAREN TRPAREN TEQUAL
+%token IF ELSE
 
-%type <node> Expr Stmt Ternary
-%type <stmts> Program StmtList
+%type <node> Expr Stmt Ternary If_statement Else_stmt
+%type <stmts> Program StmtList Tail
 
 %left TPLUS TDASH
 %left TSTAR TSLASH
@@ -50,7 +51,7 @@ StmtList : Stmt
          { $$->push_back($3); }
 	     ;
 
-Stmt : TLET TIDENT TEQUAL Expr
+Stmt :  TLET TIDENT TEQUAL Expr
      {
         if(symbol_table.contains($2)) {
             // tried to redeclare variable, so error
@@ -73,7 +74,27 @@ Stmt : TLET TIDENT TEQUAL Expr
             yyerror("tried to assign to undeclared variable.\n");
         }
     }
+    | If_statement
      ;
+
+Tail: LBRACE StmtList RBRACE
+    {
+    	$$ = $2;
+    }
+;
+
+If_statement : IF TLPAREN Expr TRPAREN Tail Else_stmt
+    {
+        $$ = new NodeIf($3, $5,$6);
+    }
+;
+
+Else_stmt: ELSE Tail
+    {
+        $$ = $2;
+    }
+;
+
 
 Ternary : Expr TQUESTION Expr TCOLON Expr
      { $$ = new NodeTernary($1, $3, $5); };
