@@ -7,3 +7,7 @@ bool SymbolTable::contains(std::string key) {
 void SymbolTable::insert(std::string key, int type) {
     table[key] = type;
 }
+
+int SymbolTable::getType(std::string key) {
+    return table[key];
+}

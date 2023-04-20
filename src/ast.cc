@@ -46,27 +46,7 @@ int NodeBinOp::get_type()
 
     // Check if types are compatible
     // int  = 1 ; long 2 ; short = 0
-    int SHORT = 0, INT = 1, LONG = 2;
-    if (left_type == right_type)
-    {
-        return left_type;
-    }
-    else if (left_type == INT && right_type == SHORT)
-    {
-        return INT;
-    }
-    else if (left_type == SHORT && right_type == INT)
-    {
-        return INT;
-    }
-    else if ((left_type == LONG && right_type == SHORT) || (left_type == SHORT && right_type == LONG))
-    {
-        return LONG;
-    }
-    else if ((left_type == LONG && right_type == INT) || (left_type == INT && right_type == LONG))
-    {
-        return LONG;
-    }
+    return left_type > right_type ? left_type : right_type;
 
     // Incompatible types
     return -1;
@@ -85,7 +65,7 @@ int NodeInt::get_type()
     {
         dtype = 2; // long
     }
-    return 2;
+    return dtype;
 }
 
 
@@ -130,6 +110,10 @@ NodeDecl::NodeDecl(std::string id, int t, Node *expr)
     dtype = t;
     identifier = id;
     expression = expr;
+    if (this->dtype < expression->get_type()){
+        perror("Type mismatch\n");
+        exit(1);
+    }
     nameOfVariable = id;
 }
 
@@ -149,9 +133,10 @@ std::string NodeDebug::to_string()
     return "(dbg " + expression->to_string() + ")";
 }
 
-NodeIdent::NodeIdent(std::string ident)
+NodeIdent::NodeIdent(std::string ident, int t)
 {
     identifier = ident;
+    dtype = t;
 }
 std::string NodeIdent::to_string()
 {

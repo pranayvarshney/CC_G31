@@ -77,7 +77,7 @@ Expr : TINT_LIT
      | TIDENT
      { 
         if(symbol_table.contains($1))
-            $$ = new NodeIdent($1); 
+            $$ = new NodeIdent($1, symbol_table.getType($1)); 
         else
             yyerror("using undeclared variable.\n");
      }

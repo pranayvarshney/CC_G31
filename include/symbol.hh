@@ -13,6 +13,7 @@ struct SymbolTable {
 
     bool contains(std::string key);
     void insert(std::string key, int type);
+    int getType(std::string key);
 };
 
 #endif

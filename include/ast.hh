@@ -96,7 +96,7 @@ struct NodeDebug : public Node {
 struct NodeIdent : public Node {
     std::string identifier;
 
-    NodeIdent(std::string ident);
+    NodeIdent(std::string ident, int t);
     std::string to_string();
     virtual bool isIdent() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
