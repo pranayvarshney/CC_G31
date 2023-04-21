@@ -105,9 +105,10 @@ struct NodeIdent : public Node {
     Node for `if` statements
 */
 struct NodeIf : public Node {
-    Node *condition, *if_branch, *else_branch;
+    Node *condition;
+    NodeStmts *if_branch, *else_branch;
 
-    NodeIf(Node *condition, Node *if_branch, Node *else_branch);
+    NodeIf(Node *condition, NodeStmts *if_branch, NodeStmts *else_branch);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };

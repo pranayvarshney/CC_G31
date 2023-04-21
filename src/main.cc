@@ -64,14 +64,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-	prin = source;
-
-	prout = fopen("output.be","w");
-	prlex();
-	fclose(prout);
-	fclose(prin);
-
-	yyin = fopen("output.be","r");
+	yyin = source;
 
 	if (arg_option == ARG_OPTION_L) {
 		extern std::string token_to_string(int token, const char *lexeme);

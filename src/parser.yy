@@ -31,7 +31,7 @@ int yyerror(std::string msg);
 %token TSCOL TLPAREN TRPAREN TEQUAL
 %token IF ELSE
 
-%type <node> Expr Stmt Ternary If_statement Else_stmt
+%type <node> Expr Stmt Ternary If_statement
 %type <stmts> Program StmtList Tail
 
 %left TPLUS TDASH
@@ -41,14 +41,16 @@ int yyerror(std::string msg);
 
 Program :                
         { final_values = nullptr; }
-        | StmtList TSCOL 
+        | StmtList
         { final_values = $1; }
 	    ;
 
-StmtList : Stmt                
+StmtList : If_statement
+         { $$ = new NodeStmts(); $$->push_back($1); } 
+         | Stmt TSCOL           
          { $$ = new NodeStmts(); $$->push_back($1); }
-	     | StmtList TSCOL Stmt 
-         { $$->push_back($3); }
+	     | StmtList Stmt TSCOL 
+         { $$->push_back($2); }
 	     ;
 
 Stmt :  TLET TIDENT TEQUAL Expr
@@ -67,14 +69,13 @@ Stmt :  TLET TIDENT TEQUAL Expr
         $$ = new NodeDebug($2);
      }
      | TIDENT TEQUAL Expr
-    {
+     {
         if(symbol_table.contains($1)) {
             $$ = new NodeDecl(Node::REASSN, $1, $3);
         } else {
             yyerror("tried to assign to undeclared variable.\n");
         }
-    }
-    | If_statement
+     }
      ;
 
 Tail: LBRACE StmtList RBRACE
@@ -83,17 +84,12 @@ Tail: LBRACE StmtList RBRACE
     }
 ;
 
-If_statement : IF TLPAREN Expr TRPAREN Tail Else_stmt
+If_statement : IF TLPAREN Expr TRPAREN Tail ELSE Tail
     {
-        $$ = new NodeIf($3, $5,$6);
+        $$ = new NodeIf($3, $5,$7);
     }
 ;
 
-Else_stmt: ELSE Tail
-    {
-        $$ = $2;
-    }
-;
 
 
 Ternary : Expr TQUESTION Expr TCOLON Expr

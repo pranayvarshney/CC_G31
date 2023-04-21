@@ -18,9 +18,6 @@ extern int yyerror(std::string msg);
 %}
 
 %%
- 
-"if"			{ return IF; }
-"else"	        { return ELSE; }
 "+"       { return TPLUS; }
 "-"       { return TDASH; }
 "*"       { return TSTAR; }
@@ -31,11 +28,13 @@ extern int yyerror(std::string msg);
 "="       { return TEQUAL; }
 "?"       { return TQUESTION; }
 ":"       { return TCOLON; }
-"{"       { return LBRACE; }
-"}"       { return RBRACE; }
 "dbg"     { return TDBG; }
 "let"     { return TLET; }
+"{"       { return LBRACE; }
+"}"       { return RBRACE; }
 [0-9]+    { yylval.lexeme = std::string(yytext); return TINT_LIT; }
+"if"			{ return IF; }
+"else"	        { return ELSE; }
 [a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
 .         { yyerror("unknown char"); }
