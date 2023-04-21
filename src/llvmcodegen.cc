@@ -144,4 +144,8 @@ Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler) {
     return compiler->builder.CreateLoad(compiler->builder.getInt32Ty(), alloc, identifier);
 }
 
+Value *NodeIf::llvm_codegen(LLVMCompiler *compiler) {
+    return nullptr;
+}
+
 #undef MAIN_FUNC

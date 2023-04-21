@@ -12,7 +12,7 @@ Base node class. Defined as `abstract`.
 */
 struct Node {
     enum NodeType {
-        BIN_OP, INT_LIT, STMTS, ASSN, DBG, IDENT
+        BIN_OP, INT_LIT, STMTS, ASSN, DBG, IDENT, IF
     } type;
 
     int dtype;
@@ -101,6 +101,18 @@ struct NodeIdent : public Node {
     virtual bool isIdent() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
     int get_type();
+};
+
+/**
+    Node for `if` statements
+*/
+struct NodeIf : public Node {
+    Node *condition;
+    NodeStmts *if_branch, *else_branch;
+
+    NodeIf(Node *condition, NodeStmts *if_branch, NodeStmts *else_branch);
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
 #endif

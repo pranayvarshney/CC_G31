@@ -146,3 +146,14 @@ int NodeIdent::get_type()
 {
     return this->dtype;
 }
+
+NodeIf::NodeIf(Node *conditionptr, NodeStmts *ifbranch, NodeStmts *elsebranch) {
+    type = IF;
+    condition = conditionptr;
+    if_branch = ifbranch;
+    else_branch = elsebranch;
+}
+std::string NodeIf::to_string() {
+    std::string out = "(if " + condition->to_string() + " then "+ if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    return out;
+}
