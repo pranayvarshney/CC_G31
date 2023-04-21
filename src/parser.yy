@@ -53,6 +53,8 @@ Program :
 
 StmtList : If_statement
          { $$ = new NodeStmts(); $$->push_back($1); } 
+         | StmtList If_statement
+         { $$->push_back($2); }
          | Stmt TSCOL           
          { $$ = new NodeStmts(); $$->push_back($1); }
 	     | StmtList Stmt TSCOL 
@@ -81,9 +83,12 @@ Tail: LBRACE StmtList RBRACE
      }
      ;
 
-If_statement : IF TLPAREN Expr TRPAREN Tail ELSE Tail
+If_statement : 
+     { increment_scope(); }
+     IF TLPAREN Expr TRPAREN Tail ELSE Tail
      {
-        $$ = new NodeIf($3, $5,$7);
+        $$ = new NodeIf($4, $6,$8);
+        decrement_scope();
      }
      ;
 
