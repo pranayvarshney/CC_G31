@@ -31,13 +31,14 @@ int yyerror(std::string msg);
 
 }
 
-%token TPLUS TDASH TSTAR TSLASH TCOLON 
+%token TPLUS TDASH TSTAR TSLASH TCOLON TCOMMA
 %token <lexeme> TINT_LIT TTYPE TIDENT
-%token INT TLET TDBG TRET TFUN 
-%token TSCOL TLPAREN TRPAREN TEQUAL TCOMMA TLCURR TRCURR
+%token INT TLET TDBG 
+%token TSCOL TLPAREN TRPAREN TEQUAL 
+%token IF ELSE LBRACE RBRACE TRET TFUN
 
-%type <node> Expr Stmt Function ArgumentList
-%type <stmts> Program StmtList 
+%type <node> Expr Stmt If_statement Function
+%type <stmts> Program StmtList Tail ArgumentList
 
 %left TPLUS TDASH
 %left TSTAR TSLASH
@@ -46,14 +47,18 @@ int yyerror(std::string msg);
 
 Program :                
         { final_values = nullptr; }
-        | StmtList TSCOL 
+        | StmtList
         { final_values = $1; }
 	    ;
 
-StmtList : Stmt                
+StmtList : If_statement
+         { $$ = new NodeStmts(); $$->push_back($1); } 
+         | StmtList If_statement
+         { $$->push_back($2); }
+         | Stmt TSCOL           
          { $$ = new NodeStmts(); $$->push_back($1); }
-	     | StmtList TSCOL Stmt 
-         { $$->push_back($3); }
+	     | StmtList Stmt TSCOL 
+         { $$->push_back($2); }
 	     ;
 
 Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
@@ -74,7 +79,7 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      Function
       ;
 
-Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE TLCURR StmtList TRET Expr TRCURR 
+Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TRET Expr LBRACE 
     {
         if(symbol_table.contains($2)) {
             // tried to redeclare variable, so error
@@ -100,12 +105,27 @@ ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
     ;
 
 
+Tail: LBRACE StmtList RBRACE
+     {
+    	$$ = $2;
+     }
+     ;
+
+If_statement : 
+     { increment_scope(); }
+     IF Expr Tail ELSE Tail
+     {
+        $$ = new NodeIf($3, $4,$6);
+        decrement_scope();
+     }
+     ;
+
 Expr : TINT_LIT               
      { $$ = new NodeInt(std::stoll($1)); }
      | TIDENT
      { 
         if(symbol_table.contains($1))
-            $$ = new NodeIdent($1); 
+            $$ = new NodeIdent($1, symbol_table.getType($1)); 
         else
             yyerror("using undeclared variable.\n");
      }

@@ -144,4 +144,67 @@ Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler) {
     return compiler->builder.CreateLoad(compiler->builder.getInt32Ty(), alloc, identifier);
 }
 
+Value *NodeIf::llvm_codegen(LLVMCompiler *compiler) {
+    Value *cond = condition->llvm_codegen(compiler);
+    if(!cond){
+        std::cerr << "Error: If condition is null" << std::endl;
+        return nullptr;
+    }
+    // cond->print(llvm::outs());
+    cond = compiler->builder.CreateICmpNE(
+        cond,
+        compiler->builder.getInt32(0),
+        "ifcond"
+    );
+    // cond->print(llvm::outs());
+    
+    Function *func = compiler->builder.GetInsertBlock()->getParent();
+
+    BasicBlock *then_bb = BasicBlock::Create(*compiler->context, "then", func);
+    BasicBlock *else_bb = BasicBlock::Create(*compiler->context, "else");
+    BasicBlock *merge_bb = BasicBlock::Create(*compiler->context, "ifcont");
+
+    compiler->builder.CreateCondBr(cond, then_bb, else_bb);
+
+    compiler->builder.SetInsertPoint(then_bb);
+
+    Value *then_val = if_branch->llvm_codegen(compiler);
+    if(!then_val){
+        std::cerr << "Error: If branch is null" << std::endl;
+        return nullptr;
+    }
+
+    compiler->builder.CreateBr(merge_bb);
+    then_bb = compiler->builder.GetInsertBlock();
+
+    func->getBasicBlockList().push_back(else_bb);
+    compiler->builder.SetInsertPoint(else_bb);
+
+    Value *else_val = else_branch->llvm_codegen(compiler);
+    if(!else_val){
+        std::cerr << "Error: Else branch is null" << std::endl;
+        return nullptr;
+    }
+
+    compiler->builder.CreateBr(merge_bb);
+    else_bb = compiler->builder.GetInsertBlock();
+
+    func->getBasicBlockList().push_back(merge_bb);
+    compiler->builder.SetInsertPoint(merge_bb);
+
+    // then_val->print(llvm::outs());
+
+    PHINode *phi_node = compiler->builder.CreatePHI(
+        then_val->getType(),
+        2,
+        "iftmp"
+    );
+
+    phi_node->addIncoming(then_val, then_bb);
+    phi_node->addIncoming(else_val, else_bb);
+
+    return phi_node;
+    // return nullptr;
+}
+
 #undef MAIN_FUNC
