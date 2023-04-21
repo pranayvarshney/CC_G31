@@ -1,6 +1,4 @@
-if 2 {
-    let a : int = 1;
-}
-else {
-    let b : int = 2;
-}
+let s : short = 3200 ;
+let n : short = 32767;
+let k : short = n *s ;
+dbg k;

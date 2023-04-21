@@ -42,6 +42,11 @@ clean:
 
 program: $(BIN) $(BEBIN)
 
+kunal: 
+	@make compiler -j12
+	@make program -j12
+	@./bin/test test.be 
+
 $(BEBIN): obj/test.o obj/runtime_lib.o
 	@echo "Building executable..."
 	@echo "clang++ obj/test.o obj/runtime_lib.o -o $(BEBIN)"; clang++ obj/test.o obj/runtime_lib.o -o $(BEBIN)
