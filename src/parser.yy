@@ -85,9 +85,9 @@ Tail: LBRACE StmtList RBRACE
 
 If_statement : 
      { increment_scope(); }
-     IF TLPAREN Expr TRPAREN Tail ELSE Tail
+     IF Expr Tail ELSE Tail
      {
-        $$ = new NodeIf($4, $6,$8);
+        $$ = new NodeIf($3, $4,$6);
         decrement_scope();
      }
      ;

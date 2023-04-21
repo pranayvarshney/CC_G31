@@ -1,4 +1,4 @@
-if (2) {
+if 2 {
     let a : int = 1;
 }
 else {
