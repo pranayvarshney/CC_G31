@@ -31,13 +31,13 @@ int yyerror(std::string msg);
 
 }
 
-%token TPLUS TDASH TSTAR TSLASH TCOLON
+%token TPLUS TDASH TSTAR TSLASH TCOLON 
 %token <lexeme> TINT_LIT TTYPE TIDENT
-%token INT TLET TDBG
-%token TSCOL TLPAREN TRPAREN TEQUAL
+%token INT TLET TDBG TRET TFUN 
+%token TSCOL TLPAREN TRPAREN TEQUAL TCOMMA TLCURR TRCURR
 
-%type <node> Expr Stmt
-%type <stmts> Program StmtList
+%type <node> Expr Stmt Function ArgumentList
+%type <stmts> Program StmtList 
 
 %left TPLUS TDASH
 %left TSTAR TSLASH
@@ -70,7 +70,35 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      { 
         $$ = new NodeDebug($2);
      }
-     ;
+     |
+     Function
+      ;
+
+Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE TLCURR StmtList TRET Expr TRCURR 
+    {
+        if(symbol_table.contains($2)) {
+            // tried to redeclare variable, so error
+            yyerror("tried to redeclare function.\n");
+        } else {
+            // symbol_table.insert($2, type_table[$2]);
+            // $$ = new NodeFunction($2, $4, type_table[$6], $8, type_table[$10], $13);
+        }
+    }
+;
+
+Arguments : ArgumentList
+    | 
+
+ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
+    {
+        // $$.push_back(std::make_pair($1, type_table[$3]));
+    }
+    | TIDENT TCOLON TTYPE
+    {
+        // $$.push_back(std::make_pair($1, type_table[$3]));
+    }
+    ;
+
 
 Expr : TINT_LIT               
      { $$ = new NodeInt(std::stoll($1)); }

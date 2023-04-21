@@ -1,2 +1,5 @@
-let kmk : int  = 101+ 5 + 5 + 54*88;
-dbg kmk;
+fun add(a : int, b : long) : long {
+    ret 10;
+};
+let a : int = 2+3*8-9;
+dbg a;
