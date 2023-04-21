@@ -154,6 +154,14 @@ NodeIf::NodeIf(Node *conditionptr, NodeStmts *ifbranch, NodeStmts *elsebranch) {
     else_branch = elsebranch;
 }
 std::string NodeIf::to_string() {
-    std::string out = "(if " + condition->to_string() + " then "+ if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    std::string out;
+    if(if_branch && else_branch)
+        out = "(if " + condition->to_string() + " then " + if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    else if(else_branch)
+        out = "(if " + condition->to_string() + " then else " + else_branch->to_string() + ')';
+    else if(if_branch)
+        out = "(if " + condition->to_string() + " then " + if_branch->to_string() + " else )";
+    else
+        out = "(if " + condition->to_string() + " then else )";
     return out;
 }

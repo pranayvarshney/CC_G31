@@ -45,8 +45,8 @@ int yyerror(std::string msg);
 
 %%
 
-Program :                
-        { final_values = nullptr; }
+Program :
+        { $$ = nullptr; }
         | StmtList
         { final_values = $1; }
 	    ;
@@ -105,7 +105,7 @@ ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
     ;
 
 
-Tail: LBRACE StmtList RBRACE
+Tail: LBRACE Program RBRACE
      {
     	$$ = $2;
      }
