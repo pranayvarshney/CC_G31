@@ -199,7 +199,7 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     compiler->builder.SetInsertPoint(merge_bb);
 
     PHINode *phi_node = compiler->builder.CreatePHI(
-        compiler->builder.getInt64Ty(),
+        then_val->getType(),
         2,
         "iftmp");
 

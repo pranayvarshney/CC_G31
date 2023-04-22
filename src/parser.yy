@@ -97,10 +97,12 @@ Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TR
 Arguments : ArgumentList
     { $$ = $1; }
     |
+    { $$ = nullptr; }
     ;
 
 ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
     {
+        $$ = new NodeArgList();
         $$->push_back($1, type_table[$3]);
     }
     | TIDENT TCOLON TTYPE
@@ -113,6 +115,10 @@ ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
 Tail: LBRACE StmtList RBRACE
      {
     	$$ = $2;
+     }
+     | LBRACE RBRACE
+     {
+        $$ = new NodeStmts();
      }
      ;
 
