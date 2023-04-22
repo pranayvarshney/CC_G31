@@ -26,9 +26,8 @@ void LLVMCompiler::compile(Node *root)
     // void printi();
     FunctionType *printi_func_type = FunctionType::get(
         builder.getVoidTy(),
-        {builder.getInt16Ty()},
-        false
-    );
+        {builder.getInt64Ty()},
+        false);
     Function::Create(
         printi_func_type,
         GlobalValue::ExternalLinkage,
@@ -42,17 +41,17 @@ void LLVMCompiler::compile(Node *root)
     Function::Create(
         printi_func_type1,
         GlobalValue::ExternalLinkage,
-        "printi",
+        "printi2",
         &module);
 
-    FunctionType *printi_func_type3 = FunctionType::get(
+    FunctionType *printi_func_type2 = FunctionType::get(
         builder.getVoidTy(),
-        {builder.getInt64Ty()},
+        {builder.getInt16Ty()},
         false);
     Function::Create(
-        printi_func_type3,
+        printi_func_type2,
         GlobalValue::ExternalLinkage,
-        "printi",
+        "printi3",
         &module);
     /* we can get this later
         module.getFunction("printi");
@@ -117,7 +116,23 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler)
 {
     Value *expr = expression->llvm_codegen(compiler);
 
-    Function *printi_func = compiler->module.getFunction("printi");
+    // Function *printi_func = compiler->module.getFunction("printi");
+    // compiler->builder.CreateCall(printi_func, {expr});
+    Function *printi_func;
+
+    if (expr->getType() == compiler->builder.getInt16Ty())
+    {
+        printi_func = compiler->module.getFunction("printi3");
+    }
+    else if (expr->getType() == compiler->builder.getInt32Ty())
+    {
+        printi_func = compiler->module.getFunction("printi2");
+    }
+    else
+    {
+        printi_func = compiler->module.getFunction("printi");
+    }
+
     compiler->builder.CreateCall(printi_func, {expr});
 
     return expr;

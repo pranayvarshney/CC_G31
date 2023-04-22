@@ -1,14 +1,13 @@
 #include <cstdio>
 
-extern "C"
-void printi(long long int i) {
+extern "C" void printi(long long int i) {
     printf("%lld\n", i);
 }
-void printi(int i)
+extern "C"  void printi2(int i)
 {
     printf("%d\n", i);
 }
-void printi(short i)
+extern "C" void printi3(short i)
 {
     printf("%hd\n", i);
 }
