@@ -38,7 +38,8 @@ int yyerror(std::string msg);
 %token IF ELSE LBRACE RBRACE TRET TFUN
 
 %type <node> Expr Stmt If_statement Function
-%type <stmts> Program StmtList Tail ArgumentList
+%type <stmts> Program StmtList Tail 
+%type <arglist> Arguments ArgumentList
 
 %left TPLUS TDASH
 %left TSTAR TSLASH
@@ -79,28 +80,32 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      Function
       ;
 
-Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TRET Expr LBRACE 
+Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TRET Expr RBRACE 
     {
         if(symbol_table.contains($2)) {
             // tried to redeclare variable, so error
             yyerror("tried to redeclare function.\n");
         } else {
-            // symbol_table.insert($2, type_table[$2]);
-            // $$ = new NodeFunction($2, $4, type_table[$6], $8, type_table[$10], $13);
-        }
+            // std::vector<std::pair<std::string, int>> args = $4;
+             symbol_table.insert($2,type_table[$7]);
+            // $$ = new NodeFunction($2, args, type_table[$7], $9, $11);
+            }
+        
     }
 ;
 
 Arguments : ArgumentList
-    | 
+    { $$ = $1; }
+    |
+    ;
 
 ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
     {
-        // $$.push_back(std::make_pair($1, type_table[$3]));
+        $$->push_back($1, type_table[$3]);
     }
     | TIDENT TCOLON TTYPE
     {
-        // $$.push_back(std::make_pair($1, type_table[$3]));
+        $$->push_back($1, type_table[$3]);
     }
     ;
 

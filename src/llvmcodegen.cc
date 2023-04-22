@@ -25,7 +25,7 @@ void LLVMCompiler::compile(Node *root) {
     // void printi();
     FunctionType *printi_func_type = FunctionType::get(
         builder.getVoidTy(),
-        {builder.getInt32Ty()},
+        {builder.getInt64Ty()},
         false
     );
     Function::Create(
@@ -41,7 +41,7 @@ void LLVMCompiler::compile(Node *root) {
     /* Main Function */
     // int main();
     FunctionType *main_func_type = FunctionType::get(
-        builder.getInt32Ty(), {}, false /* is vararg */
+        builder.getInt64Ty(), {}, false /* is vararg */
     );
     Function *main_func = Function::Create(
         main_func_type,
@@ -63,7 +63,7 @@ void LLVMCompiler::compile(Node *root) {
     root->llvm_codegen(this);
 
     // return 0;
-    builder.CreateRet(builder.getInt32(0));
+    builder.CreateRet(builder.getInt64(0));
 }
 
 void LLVMCompiler::dump() {
@@ -102,13 +102,13 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler) {
 }
 
 Value *NodeInt::llvm_codegen(LLVMCompiler *compiler) {
-    return compiler->builder.getInt32(value);
+    return compiler->builder.getInt64(value);
 }
 
 Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler) {
     Value *left_expr = left->llvm_codegen(compiler);
     Value *right_expr = right->llvm_codegen(compiler);
-
+    
     switch(op) {
         case PLUS:
         return compiler->builder.CreateAdd(left_expr, right_expr, "addtmp");
@@ -124,13 +124,12 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler) {
 
 Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler) {
     Value *expr = expression->llvm_codegen(compiler);
-
     IRBuilder<> temp_builder(
         &MAIN_FUNC->getEntryBlock(),
         MAIN_FUNC->getEntryBlock().begin()
     );
 
-    AllocaInst *alloc = temp_builder.CreateAlloca(compiler->builder.getInt32Ty(), 0, identifier);
+    AllocaInst *alloc = temp_builder.CreateAlloca(compiler->builder.getInt64Ty(), 0, identifier);
 
     compiler->locals[identifier] = alloc;
 
@@ -141,7 +140,7 @@ Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler) {
     AllocaInst *alloc = compiler->locals[identifier];
 
     // if your LLVM_MAJOR_VERSION >= 14
-    return compiler->builder.CreateLoad(compiler->builder.getInt32Ty(), alloc, identifier);
+    return compiler->builder.CreateLoad(compiler->builder.getInt64Ty(), alloc, identifier);
 }
 
 Value *NodeIf::llvm_codegen(LLVMCompiler *compiler) {
@@ -153,7 +152,7 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler) {
     // cond->print(llvm::outs());
     cond = compiler->builder.CreateICmpNE(
         cond,
-        compiler->builder.getInt32(0),
+        compiler->builder.getInt64(0),
         "ifcond"
     );
     // cond->print(llvm::outs());

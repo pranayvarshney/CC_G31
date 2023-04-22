@@ -14,6 +14,8 @@ struct ParserValue {
 
     Node *node;
     NodeStmts *stmts;
+    NodeArgList *arglist;
+
 };
 
 #endif

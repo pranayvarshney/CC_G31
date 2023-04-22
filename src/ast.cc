@@ -107,9 +107,9 @@ std::string NodeStmts::to_string()
 NodeDecl::NodeDecl(std::string id, int t, Node *expr)
 {
     type = ASSN;
-    dtype = t;
     identifier = id;
     expression = expr;
+    dtype = t;
     if (this->dtype < expression->get_type()){
         perror("Type mismatch\n");
         exit(1);
@@ -155,5 +155,45 @@ NodeIf::NodeIf(Node *conditionptr, NodeStmts *ifbranch, NodeStmts *elsebranch) {
 }
 std::string NodeIf::to_string() {
     std::string out = "(if " + condition->to_string() + " then "+ if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    return out;
+}
+
+NodeFunction::NodeFunction(std::string name, std::vector<std::pair<std::string, int>> args, int ret_type, NodeStmts *body)
+{
+    type = FUNCTION;
+    function_name = name;
+    arguments = args;
+    return_type = ret_type;
+    function_body = body;
+}
+
+std::string NodeFunction::to_string()
+{
+    std::string out = "Function " + function_name + "(";
+    for (auto arg : arguments)
+    {
+        out += arg.first + " : " + std::to_string(arg.second) + ", ";
+    }
+    out += ") -> " + std::to_string(return_type) + " " + function_body->to_string();
+    return out;
+}
+
+NodeArgList::NodeArgList(){
+    type = ARG_LIST;
+    list = std::vector<std::pair<std::string, int>>();
+}
+
+void NodeArgList::push_back(std::string name, int dtype)
+{
+    list.push_back(std::make_pair(name, dtype));
+}
+std::string NodeArgList::to_string()
+{
+    std::string out = "(";
+    for (auto arg : list)
+    {
+        out += arg.first + " : " + std::to_string(arg.second) + ", ";
+    }
+    out += ")";
     return out;
 }

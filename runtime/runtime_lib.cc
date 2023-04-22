@@ -1,6 +1,6 @@
 #include <cstdio>
 
 extern "C"
-void printi(int i) {
-    printf("%d\n", i);
+void printi(long long i) {
+    printf("%lld\n", i);
 }

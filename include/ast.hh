@@ -10,9 +10,19 @@ struct LLVMCompiler;
 /**
 Base node class. Defined as `abstract`.
 */
-struct Node {
-    enum NodeType {
-        BIN_OP, INT_LIT, STMTS, ASSN, DBG, IDENT, IF
+struct Node
+{
+    enum NodeType
+    {
+        BIN_OP,
+        INT_LIT,
+        STMTS,
+        ASSN,
+        DBG,
+        IDENT,
+        IF,
+        FUNCTION,
+        ARG_LIST
     } type;
 
     int dtype;
@@ -24,13 +34,12 @@ struct Node {
     virtual int get_type();
 };
 
-
-
 /**
     Node for list of statements
 */
-struct NodeStmts : public Node {
-    std::vector<Node*> list;
+struct NodeStmts : public Node
+{
+    std::vector<Node *> list;
 
     NodeStmts();
     void push_back(Node *node);
@@ -41,9 +50,14 @@ struct NodeStmts : public Node {
 /**
     Node for binary operations
 */
-struct NodeBinOp : public Node {
-    enum Op {
-        PLUS, MINUS, MULT, DIV
+struct NodeBinOp : public Node
+{
+    enum Op
+    {
+        PLUS,
+        MINUS,
+        MULT,
+        DIV
     } op;
 
     Node *left, *right;
@@ -57,7 +71,8 @@ struct NodeBinOp : public Node {
 /**
     Node for integer literals
 */
-struct NodeInt : public Node {
+struct NodeInt : public Node
+{
     long long int value;
 
     NodeInt(long long int val);
@@ -71,7 +86,8 @@ struct NodeInt : public Node {
 /**
     Node for variable assignments
 */
-struct NodeDecl : public Node {
+struct NodeDecl : public Node
+{
     std::string identifier;
     Node *expression;
     NodeDecl(std::string id, int t, Node *expr);
@@ -82,7 +98,8 @@ struct NodeDecl : public Node {
 /**
     Node for `dbg` statements
 */
-struct NodeDebug : public Node {
+struct NodeDebug : public Node
+{
     Node *expression;
 
     NodeDebug(Node *expr);
@@ -93,7 +110,8 @@ struct NodeDebug : public Node {
 /**
     Node for idnetifiers
 */
-struct NodeIdent : public Node {
+struct NodeIdent : public Node
+{
     std::string identifier;
 
     NodeIdent(std::string ident, int t);
@@ -106,13 +124,34 @@ struct NodeIdent : public Node {
 /**
     Node for `if` statements
 */
-struct NodeIf : public Node {
+struct NodeIf : public Node
+{
     Node *condition;
     NodeStmts *if_branch, *else_branch;
 
     NodeIf(Node *condition, NodeStmts *if_branch, NodeStmts *else_branch);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+};
+
+struct NodeFunction : public Node
+{
+    std::string function_name;
+    std::vector<std::pair<std::string, int>> arguments;
+    int return_type;
+    NodeStmts *function_body;
+    NodeFunction(std::string name, std::vector<std::pair<std::string, int>> args, int ret_type, NodeStmts *body);
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
+};
+
+struct NodeArgList : public Node
+{
+    NodeArgList();
+    void push_back(std::string name, int dtype);
+    std::vector<std::pair<std::string, int>> list;
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
 };
 
 #endif

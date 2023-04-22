@@ -48,6 +48,7 @@ std::string token_to_string(int token, const char *lexeme) {
         case TEQUAL: s = "TEQUAL"; break;
         case TCOLON: s = "TCOLON"; break;
         case TCOMMA: s = "TCOMMA"; break;
+        case TFUN: s = "TFUN"; break;
         
         case TDBG: s = "TDBG"; break;
         case TLET: s = "TLET"; break;
