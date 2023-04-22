@@ -172,7 +172,9 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
 
     Value *then_val = if_branch->llvm_codegen(compiler);
     if (!then_val)
-        return nullptr;
+    {
+        then_val = compiler->builder.getInt64(0);
+    }
 
     StoreInst *store = dyn_cast<StoreInst>(then_val);
     if (store)
@@ -186,7 +188,9 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
 
     Value *else_val = else_branch->llvm_codegen(compiler);
     if (!else_val)
-        return nullptr;
+    {
+        else_val = compiler->builder.getInt64(0);
+    }
 
     StoreInst *store2 = dyn_cast<StoreInst>(else_val);
     if (store2)
