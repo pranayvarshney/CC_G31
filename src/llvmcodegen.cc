@@ -170,6 +170,8 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler)
 Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
 {
     Value *expr = expression->llvm_codegen(compiler);
+    Type* expr_type = expr->getType();
+
     IRBuilder<> temp_builder(
         &MAIN_FUNC->getEntryBlock(),
         MAIN_FUNC->getEntryBlock().begin());
@@ -178,14 +180,24 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     {
         alloc = temp_builder.CreateAlloca(compiler->builder.getInt16Ty(), 0, identifier);
     }
-    if (this->dtype == 1)
+    else if (this->dtype == 1)
     {
         alloc = temp_builder.CreateAlloca(compiler->builder.getInt32Ty(), 0, identifier);
+        if (expr_type == compiler->builder.getInt16Ty())
+        {
+            expr = compiler->builder.CreateSExt(expr, compiler->builder.getInt32Ty());
+        }
     }
     else{
-        
+        if (expr_type == compiler->builder.getInt32Ty() || expr_type == compiler->builder.getInt16Ty())
+        {
+            expr = compiler->builder.CreateSExt(expr, compiler->builder.getInt64Ty());
+        }
+
         alloc = temp_builder.CreateAlloca(compiler->builder.getInt64Ty(), 0, identifier);
    }
+       
+
     if(scope<=(int)compiler->locals[identifier].size())
         compiler->locals[identifier][scope-1] = alloc;
     else
