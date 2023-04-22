@@ -1,6 +1,6 @@
-let a : short = 32767;
-let b : int = 2147483647;
-let c : long = 2;
+let a : short = 105;
+let b : int = 100;
+let c : int = b+a;
 dbg a;
 dbg b;
 dbg c;
