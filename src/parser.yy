@@ -163,9 +163,7 @@ Expr : TINT_LIT
      }
      | Expr TPLUS Expr
      { 
-         
         if($1->get_type()==2 ||$3->get_type()==2 ){
-            
             if($1->isIntLit() && $3->isIntLit()) {
                 if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
                 $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue());
@@ -184,14 +182,13 @@ Expr : TINT_LIT
                     $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue());
                  }
             } else {
-                
+                //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3);
             }
         }
         else if($1->get_type()==1 || $3->get_type()==1){
             
             if($1->isIntLit() && $3->isIntLit()) {
-                
                 if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
                     $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue());
                 } 
@@ -202,7 +199,7 @@ Expr : TINT_LIT
                     $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue());
                 }
             } else {
-                yyerror("here");
+                // yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3);
             }
         }
@@ -217,24 +214,49 @@ Expr : TINT_LIT
         }
      }
      | Expr TDASH Expr
-     { 
-           if($1->get_type()==2 ||$3->get_type()==2 ){
+    { 
+        if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
-            long long int val = dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue();
-            $$ = new NodeLong(val);
+                if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
+                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue());
+                 }
+                else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                 }
             } else {
+                //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3);
             }
         }
-         else if($1->get_type()==1 || $3->get_type()==1  ){
+        else if($1->get_type()==1 || $3->get_type()==1){
+            
             if($1->isIntLit() && $3->isIntLit()) {
-                int val = dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue();
-                $$ = new NodeInt(val);
+                if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue());
+                }
             } else {
+                // yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3);
             }
         }
         else{
+           
              if($1->isIntLit() && $3->isIntLit()) {
                 short val = dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue();
                 $$ = new NodeShort(val);
@@ -244,24 +266,49 @@ Expr : TINT_LIT
         }
      }
      | Expr TSTAR Expr
-     { 
-          if($1->get_type()==2 ||$3->get_type()==2 ){
+      { 
+        if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
-            long long int val = dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue();
-            $$ = new NodeLong(val);
+                if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
+                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue());
+                 }
+                else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                 }
             } else {
+                //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3);
             }
         }
-        else if($1->get_type()==1 || $3->get_type()==1  ){
+        else if($1->get_type()==1 || $3->get_type()==1){
+            
             if($1->isIntLit() && $3->isIntLit()) {
-                int val = dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue();
-                $$ = new NodeInt(val);
+                if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue());
+                }
             } else {
+                // yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3);
             }
         }
         else{
+           
              if($1->isIntLit() && $3->isIntLit()) {
                 short val = dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue();
                 $$ = new NodeShort(val);
@@ -271,24 +318,49 @@ Expr : TINT_LIT
         }
      }
      | Expr TSLASH Expr
-     { 
-          if($1->get_type()==2 ||$3->get_type()==2 ){
+       { 
+        if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
-            long long int val = dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue();
-            $$ = new NodeLong(val);
+                if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
+                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue());
+                 }
+                else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
+                   
+                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                } 
+                else {
+                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                 }
             } else {
+                //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3);
             }
         }
-        else if($1->get_type()==1 || $3->get_type()==1  ){
+        else if($1->get_type()==1 || $3->get_type()==1){
+            
             if($1->isIntLit() && $3->isIntLit()) {
-                int val = dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue();
-                $$ = new NodeInt(val);
+                if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                } 
+                else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
+                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue());
+                }
             } else {
+                // yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3);
             }
         }
         else{
+           
              if($1->isIntLit() && $3->isIntLit()) {
                 short val = dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue();
                 $$ = new NodeShort(val);

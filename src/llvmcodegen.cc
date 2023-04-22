@@ -159,9 +159,9 @@ Value *NodeBinOp::llvm_codegen(LLVMCompiler *compiler)
     Type *rtype = right_expr->getType();
 
     if(ltype->getIntegerBitWidth() < rtype->getIntegerBitWidth()) {
-        left_expr = compiler->builder.CreateSExt(left_expr, rtype);
+        left_expr = compiler->builder.CreateZExt(left_expr, rtype);
     } else if(ltype->getIntegerBitWidth() > rtype->getIntegerBitWidth()) {
-        right_expr = compiler->builder.CreateSExt(right_expr, ltype);
+        right_expr = compiler->builder.CreateZExt(right_expr, ltype);
     }
     
     switch(op) {
