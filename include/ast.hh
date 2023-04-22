@@ -32,6 +32,7 @@ struct Node
     virtual llvm::Value *llvm_codegen(LLVMCompiler *compiler) = 0;
     std::string nameOfVariable;
     virtual int get_type();
+    void set_type(int i) {dtype = i;};
 };
 
 /**
