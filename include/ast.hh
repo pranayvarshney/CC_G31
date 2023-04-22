@@ -71,16 +71,38 @@ struct NodeBinOp : public Node
 /**
     Node for integer literals
 */
+struct NodeShort : public Node
+{
+    short value;
+    NodeShort(short val);
+    std::string to_string();
+    short getValue() const { return value; }
+    virtual bool isIntLit() const { return true; }
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+    int get_type(){return 0;};
+};
+
+
 struct NodeInt : public Node
 {
-    long long int value;
-
-    NodeInt(long long int val);
+    int value;
+    NodeInt(int val);
     std::string to_string();
     int getValue() const { return value; }
     virtual bool isIntLit() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
-    int get_type();
+    int get_type() { return 1; };
+};
+
+struct NodeLong : public Node
+{
+    long long int value;
+    NodeLong(long long int val);
+    std::string to_string();
+    long long int getValue() const { return value; }
+    virtual bool isIntLit() const { return true; }
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+    int get_type() { return 2; };
 };
 
 /**

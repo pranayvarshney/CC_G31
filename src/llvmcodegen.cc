@@ -26,11 +26,31 @@ void LLVMCompiler::compile(Node *root)
     // void printi();
     FunctionType *printi_func_type = FunctionType::get(
         builder.getVoidTy(),
-        {builder.getInt64Ty()},
+        {builder.getInt16Ty()},
         false
     );
     Function::Create(
         printi_func_type,
+        GlobalValue::ExternalLinkage,
+        "printi",
+        &module);
+
+    FunctionType *printi_func_type1 = FunctionType::get(
+        builder.getVoidTy(),
+        {builder.getInt32Ty()},
+        false);
+    Function::Create(
+        printi_func_type1,
+        GlobalValue::ExternalLinkage,
+        "printi",
+        &module);
+
+    FunctionType *printi_func_type3 = FunctionType::get(
+        builder.getVoidTy(),
+        {builder.getInt64Ty()},
+        false);
+    Function::Create(
+        printi_func_type3,
         GlobalValue::ExternalLinkage,
         "printi",
         &module);
@@ -41,7 +61,7 @@ void LLVMCompiler::compile(Node *root)
     /* Main Function */
     // int main();
     FunctionType *main_func_type = FunctionType::get(
-        builder.getInt64Ty(), {}, false /* is vararg */
+        builder.getInt32Ty(), {}, false /* is vararg */
     );
     Function *main_func = Function::Create(
         main_func_type,
@@ -61,7 +81,7 @@ void LLVMCompiler::compile(Node *root)
     root->llvm_codegen(this);
 
     // return 0;
-    builder.CreateRet(builder.getInt64(0));
+    builder.CreateRet(builder.getInt32(0));
 }
 
 void LLVMCompiler::dump()
@@ -103,7 +123,15 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler)
     return expr;
 }
 
-Value *NodeInt::llvm_codegen(LLVMCompiler *compiler) {
+Value *NodeShort::llvm_codegen(LLVMCompiler *compiler) {
+    return compiler->builder.getInt16(value);
+}
+Value *NodeInt::llvm_codegen(LLVMCompiler *compiler)
+{
+    return compiler->builder.getInt32(value);
+}
+Value *NodeLong::llvm_codegen(LLVMCompiler *compiler)
+{
     return compiler->builder.getInt64(value);
 }
 
@@ -130,9 +158,19 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     IRBuilder<> temp_builder(
         &MAIN_FUNC->getEntryBlock(),
         MAIN_FUNC->getEntryBlock().begin());
-
-    AllocaInst *alloc = temp_builder.CreateAlloca(compiler->builder.getInt64Ty(), 0, identifier);
-
+    AllocaInst *alloc;
+    if (this->dtype == 0)
+    {
+        alloc = temp_builder.CreateAlloca(compiler->builder.getInt16Ty(), 0, identifier);
+    }
+    if (this->dtype == 1)
+    {
+        alloc = temp_builder.CreateAlloca(compiler->builder.getInt32Ty(), 0, identifier);
+    }
+    else{
+        
+        alloc = temp_builder.CreateAlloca(compiler->builder.getInt64Ty(), 0, identifier);
+   }
     if(scope<=(int)compiler->locals[identifier].size())
         compiler->locals[identifier][scope-1] = alloc;
     else
@@ -146,7 +184,14 @@ Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
     AllocaInst *alloc = compiler->locals[identifier][scope-1];
 
     // if your LLVM_MAJOR_VERSION >= 14
+    if(this->dtype == 0){
+        return compiler->builder.CreateLoad(compiler->builder.getInt16Ty(), alloc, identifier);
+    }
+    if(this->dtype == 1){
+        return compiler->builder.CreateLoad(compiler->builder.getInt32Ty(), alloc, identifier);
+    }
     return compiler->builder.CreateLoad(compiler->builder.getInt64Ty(), alloc, identifier);
+
 }
 
 Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)

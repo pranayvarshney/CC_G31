@@ -51,31 +51,56 @@ int NodeBinOp::get_type()
     // Incompatible types
     return -1;
 }
-int NodeInt::get_type()
-{
-    if (value >= -32768 && value <= 32767)
-    {
-        dtype = 0; // short
-    }
-    else if (value >= -2147483648 && value <= 2147483647)
-    {
-        dtype = 1; // int
-    }
-    else
-    {
-        dtype = 2; // long
-    }
-    return dtype;
-}
+// int NodeInt::get_type()
+// {
+//     if (value >= -32768 && value <= 32767)
+//     {
+//         dtype = 0; // short
+//     }
+//     else if (value >= -2147483648 && value <= 2147483647)
+//     {
+//         dtype = 1; // int
+//     }
+//     else
+//     {
+//         dtype = 2; // long
+//     }
+//     return dtype;
+// }
 
-
-NodeInt::NodeInt(long long int val)
+NodeShort::NodeShort(short val)
 {
     type = INT_LIT;
     value = val;
+    dtype = 0;
 }
 
+std::string NodeShort::to_string()
+{
+    return std::to_string(value);
+}
+
+NodeInt::NodeInt(int val)
+{
+    type = INT_LIT;
+    value = val;
+    dtype = 1;
+}
+
+
 std::string NodeInt::to_string()
+{
+    return std::to_string(value);
+}
+
+NodeLong::NodeLong(long long int val)
+{
+    type = INT_LIT;
+    value = val;
+    dtype = 2;
+}
+
+std::string NodeLong::to_string()
 {
     return std::to_string(value);
 }
