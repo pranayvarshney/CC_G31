@@ -74,9 +74,10 @@ struct NodeInt : public Node {
 struct NodeDecl : public Node {
     std::string identifier;
     Node *expression;
-    NodeDecl(std::string id, int t, Node *expr);
+    NodeDecl(std::string id, int t, Node *expr,int s);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+    int scope;
 };
 
 /**

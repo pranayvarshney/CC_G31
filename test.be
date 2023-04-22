@@ -7,4 +7,11 @@ else {
     dbg a;
 }
 
+if 2 {
+    let a : int = 3;
+    dbg 3;
+}
+else {
+    let a : int = 4;
+}
 dbg a;

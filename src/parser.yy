@@ -68,7 +68,7 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
             yyerror("tried to redeclare variable.\n");
         } else {
             symbol_table_stack.insert($2, type_table[$4]);
-            $$ = new NodeDecl($2, type_table[$4], $6);  
+            $$ = new NodeDecl($2, type_table[$4], $6, symbol_table_stack.getIdentifierOffset($2));  
         }
      }
      | TDBG Expr

@@ -104,7 +104,7 @@ std::string NodeStmts::to_string()
     return out;
 }
 
-NodeDecl::NodeDecl(std::string id, int t, Node *expr)
+NodeDecl::NodeDecl(std::string id, int t, Node *expr,int s)
 {
     type = ASSN;
     dtype = t;
@@ -115,6 +115,7 @@ NodeDecl::NodeDecl(std::string id, int t, Node *expr)
         exit(1);
     }
     nameOfVariable = id;
+    scope = s;
 }
 
 std::string NodeDecl::to_string()

@@ -135,7 +135,10 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
 
     AllocaInst *alloc = temp_builder.CreateAlloca(compiler->builder.getInt32Ty(), 0, identifier);
 
-    compiler->locals[identifier].push_back(alloc);
+    if(scope<=compiler->locals[identifier].size())
+        compiler->locals[identifier][scope-1] = alloc;
+    else
+        compiler->locals[identifier].push_back(alloc);
 
     return compiler->builder.CreateStore(expr, alloc);
 }
