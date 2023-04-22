@@ -133,10 +133,11 @@ std::string NodeDebug::to_string()
     return "(dbg " + expression->to_string() + ")";
 }
 
-NodeIdent::NodeIdent(std::string ident, int t)
+NodeIdent::NodeIdent(std::string ident, int t,int s)
 {
     identifier = ident;
     dtype = t;
+    scope = s;
 }
 std::string NodeIdent::to_string()
 {

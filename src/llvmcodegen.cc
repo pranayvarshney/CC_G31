@@ -135,14 +135,14 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
 
     AllocaInst *alloc = temp_builder.CreateAlloca(compiler->builder.getInt32Ty(), 0, identifier);
 
-    compiler->locals[identifier] = alloc;
+    compiler->locals[identifier].push_back(alloc);
 
     return compiler->builder.CreateStore(expr, alloc);
 }
 
 Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
 {
-    AllocaInst *alloc = compiler->locals[identifier];
+    AllocaInst *alloc = compiler->locals[identifier][scope-1];
 
     // if your LLVM_MAJOR_VERSION >= 14
     return compiler->builder.CreateLoad(compiler->builder.getInt32Ty(), alloc, identifier);

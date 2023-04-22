@@ -43,8 +43,9 @@ clean:
 program: $(BIN) $(BEBIN)
 
 kunal: 
-	@make compiler -j12
-	@make program -j12
+	@make clean
+	@make compiler
+	@make program
 	@./bin/test test.be 
 
 $(BEBIN): obj/test.o obj/runtime_lib.o

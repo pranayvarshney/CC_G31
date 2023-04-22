@@ -1,9 +1,10 @@
-if 2 {
-    let a : int = 3;
-
+let a : short = 1;
+if a*2 {
+    let a : int = 2;
+    dbg a;
 }
 else {
-    dbg 5;
+    dbg a;
 }
-let a : int = 6;
+
 dbg a;
