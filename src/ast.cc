@@ -189,16 +189,16 @@ std::string NodeFunction::to_string()
 
 NodeArgList::NodeArgList(){
     type = ARG_LIST;
-    list = std::vector<NodeDecl *>();
-    call = std::vector<NodeIdent *>();
+    list = std::vector<Node *>();
+    call = std::vector<Node *>();
 }
 
-void NodeArgList::push_back(NodeDecl* arg)
+void NodeArgList::push_back(Node* arg)
 {
     list.push_back(arg);
 }
 
-void NodeArgList::push_back_call(NodeIdent* arg)
+void NodeArgList::push_back_call(Node* arg)
 {
     call.push_back(arg);
 }

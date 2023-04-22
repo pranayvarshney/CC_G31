@@ -1,11 +1,12 @@
-fun fib( a: int,b:int ) : long {
+fun fib( a: long ,b:long  ) : long {
 
-    ret a+b;
+    dbg a;
+    dbg b;
 } 
 
 fun main() : int {
     
-    let b : int = 4;
-    let a : int = 3;
-    dbg a + b;
+    let a : long = 3;
+    let b : long = 4;
+    fib(a,b);
 }

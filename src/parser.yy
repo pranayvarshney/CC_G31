@@ -118,7 +118,7 @@ ArgumentList :
         } else {
             symbol_table_stack.insert($1, type_table[$3]);
             $$ = new NodeArgList();
-            $$->push_back(new NodeDecl($1, type_table[$3], new NodeInt(0), symbol_table_stack.getIdentifierOffset($1)));  
+            $$->push_back(new NodeIdent($1, type_table[$3], symbol_table_stack.getIdentifierOffset($1)));  
         }
     }
     | ArgumentList TCOMMA TIDENT TCOLON TTYPE
@@ -128,7 +128,7 @@ ArgumentList :
             yyerror("tried to redeclare variable.\n");
         } else {
             symbol_table_stack.insert($3, type_table[$5]);
-            $$->push_back(new NodeDecl($3, type_table[$5], new NodeInt(0), symbol_table_stack.getIdentifierOffset($3)));  
+            $$->push_back(new NodeIdent($3, type_table[$5], symbol_table_stack.getIdentifierOffset($3)));  
         }
     }
     ;
@@ -254,7 +254,11 @@ Function_call_arg : TLPAREN Function_call_arg_list TRPAREN
     }
     ;
 Function_call_arg_list: 
-    TIDENT
+    TINT_LIT{
+        $$ = new NodeArgList();
+        $$->push_back_call(new NodeInt(std::stoll($1))); 
+    }
+    | TIDENT
     {
         if(symbol_table_stack.contains($1) || symbol_table_stack.parent_contains($1)){
             $$ = new NodeArgList();
@@ -269,6 +273,10 @@ Function_call_arg_list:
             $$->push_back_call(new NodeIdent($3, symbol_table_stack.getType($3),symbol_table_stack.getIdentifierOffset($3))); 
         else
             yyerror("using undeclared variable.\n");
+    }
+    | Function_call_arg_list TCOMMA TINT_LIT
+    {
+        $$->push_back_call(new NodeInt(std::stoll($3))); 
     }
 %%
 

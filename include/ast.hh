@@ -140,10 +140,10 @@ struct NodeIf : public Node
 struct NodeArgList : public Node
 {
     NodeArgList();
-    void push_back(NodeDecl *node);
-    void push_back_call(NodeIdent *node);
-    std::vector<NodeDecl *> list;
-    std::vector<NodeIdent *> call;
+    void push_back(Node *node);
+    void push_back_call(Node *node);
+    std::vector<Node *> list;
+    std::vector<Node *> call;
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
 };

@@ -263,10 +263,10 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
         compiler->module);
 
     unsigned Idx = 0;
-    for (auto &arg : func->args())
+    for (Function::arg_iterator arg = func->arg_begin(); arg != func->arg_end(); ++arg, ++Idx)
     {
-        std::string arg_name = arguments->list[Idx++]->identifier;
-        arg.setName(arg_name);
+        std::string arg_name = dynamic_cast<NodeIdent *>(arguments->list[Idx])->identifier;
+        arg->setName(arg_name);
     }
 
     BasicBlock *bb = BasicBlock::Create(*compiler->context, "entry", func);
@@ -274,15 +274,16 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
     IRBuilder<> temp_builder(
         &func->getEntryBlock(),
         func->getEntryBlock().begin());
-
-    for (auto arg : arguments->list)
+    Idx=0;
+    for (Function::arg_iterator arg = func->arg_begin(); arg != func->arg_end(); ++arg, ++Idx)
     {
-        std::string identifier = arg->identifier;
-        AllocaInst *alloc = temp_builder.CreateAlloca(getIntType(arg->dtype, compiler), 0, identifier);
+        std::string identifier = dynamic_cast<NodeIdent *>(arguments->list[Idx])->identifier;
+        AllocaInst *alloc = temp_builder.CreateAlloca(getIntType(arguments->list[Idx]->dtype, compiler), 0, identifier);
         if (scope <= (int)compiler->locals[identifier].size())
             compiler->locals[identifier][scope - 1] = alloc;
         else
             compiler->locals[identifier].push_back(alloc);
+        compiler->builder.CreateStore(func->arg_begin() + Idx, alloc);
     }
 
     if (Value *ret = function_body->llvm_codegen(compiler))
@@ -307,6 +308,16 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
 }
 
 Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler){
-    return nullptr;
+    Function *func = compiler->module.getFunction(function_name);
+    
+    std::vector<Value *> args;
+    for (auto arg : arguments->call)
+    {
+        args.push_back(arg->llvm_codegen(compiler));
+    }
+    std::string call_name = "call_" + function_name;
+    Value *ret = compiler->builder.CreateCall(func, args, call_name);
+    return ret;
+    // return nullptr;
 }
 #undef MAIN_FUNC
