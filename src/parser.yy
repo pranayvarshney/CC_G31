@@ -20,7 +20,7 @@ extern int yyparse();
 
 extern NodeStmts* final_values;
 
-SymbolTable symbol_table;
+SymbolTableStack symbol_table_stack;
 std::unordered_map<std::string, int> type_table = {
     {"int", 1},
     {"long", 2},
@@ -46,7 +46,7 @@ int yyerror(std::string msg);
 
 %%
 
-Program :                
+Program :
         { final_values = nullptr; }
         | StmtList
         { final_values = $1; }
@@ -64,12 +64,12 @@ StmtList : If_statement
 
 Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      {
-        if(symbol_table.contains($2)) {
+        if(symbol_table_stack.contains($2)) {
             // tried to redeclare variable, so error
             yyerror("tried to redeclare variable.\n");
         } else {
-            symbol_table.insert($2, type_table[$4]);
-            $$ = new NodeDecl($2, type_table[$4], $6);  
+            symbol_table_stack.insert($2, type_table[$4]);
+            $$ = new NodeDecl($2, type_table[$4], $6, symbol_table_stack.getIdentifierOffset($2));  
         }
      }
      | TDBG Expr
@@ -82,12 +82,12 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
 
 Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TRET Expr RBRACE 
     {
-        if(symbol_table.contains($2)) {
+        if(symbol_table_stack.contains($2)) {
             // tried to redeclare variable, so error
             yyerror("tried to redeclare function.\n");
         } else {
             // std::vector<std::pair<std::string, int>> args = $4;
-             symbol_table.insert($2,type_table[$7]);
+             symbol_table_stack.insert($2,type_table[$7]);
             // $$ = new NodeFunction($2, args, type_table[$7], $9, $11);
             }
         
@@ -117,11 +117,21 @@ Tail: LBRACE StmtList RBRACE
      ;
 
 If_statement : 
-     { increment_scope(); }
-     IF Expr Tail ELSE Tail
+     IF Expr {
+        SymbolTable new_table;
+        symbol_table_stack.push(new_table);
+     }
+     Tail {
+        symbol_table_stack.pop();
+     }
+     ELSE {
+        SymbolTable new_table;
+        symbol_table_stack.push(new_table);
+     }
+     Tail
      {
-        $$ = new NodeIf($3, $4,$6);
-        decrement_scope();
+        $$ = new NodeIf($2, $4,$8);
+        symbol_table_stack.pop();
      }
      ;
 
@@ -129,8 +139,8 @@ Expr : TINT_LIT
      { $$ = new NodeInt(std::stoll($1)); }
      | TIDENT
      { 
-        if(symbol_table.contains($1))
-            $$ = new NodeIdent($1, symbol_table.getType($1)); 
+        if(symbol_table_stack.contains($1) || symbol_table_stack.parent_contains($1))
+            $$ = new NodeIdent($1, symbol_table_stack.getType($1),symbol_table_stack.getIdentifierOffset($1)); 
         else
             yyerror("using undeclared variable.\n");
      }

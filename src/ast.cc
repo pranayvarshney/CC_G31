@@ -104,7 +104,7 @@ std::string NodeStmts::to_string()
     return out;
 }
 
-NodeDecl::NodeDecl(std::string id, int t, Node *expr)
+NodeDecl::NodeDecl(std::string id, int t, Node *expr,int s)
 {
     type = ASSN;
     identifier = id;
@@ -115,6 +115,7 @@ NodeDecl::NodeDecl(std::string id, int t, Node *expr)
         exit(1);
     }
     nameOfVariable = id;
+    scope = s;
 }
 
 std::string NodeDecl::to_string()
@@ -133,10 +134,11 @@ std::string NodeDebug::to_string()
     return "(dbg " + expression->to_string() + ")";
 }
 
-NodeIdent::NodeIdent(std::string ident, int t)
+NodeIdent::NodeIdent(std::string ident, int t,int s)
 {
     identifier = ident;
     dtype = t;
+    scope = s;
 }
 std::string NodeIdent::to_string()
 {
@@ -154,7 +156,15 @@ NodeIf::NodeIf(Node *conditionptr, NodeStmts *ifbranch, NodeStmts *elsebranch) {
     else_branch = elsebranch;
 }
 std::string NodeIf::to_string() {
-    std::string out = "(if " + condition->to_string() + " then "+ if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    std::string out;
+    if(if_branch && else_branch)
+        out = "(if " + condition->to_string() + " then " + if_branch->to_string() + " else " + else_branch->to_string() + ')';
+    else if(else_branch)
+        out = "(if " + condition->to_string() + " then else " + else_branch->to_string() + ')';
+    else if(if_branch)
+        out = "(if " + condition->to_string() + " then " + if_branch->to_string() + " else )";
+    else
+        out = "(if " + condition->to_string() + " then else )";
     return out;
 }
 

@@ -8,6 +8,7 @@
 #include <llvm/IR/Module.h>
 #include <unordered_map>
 #include "ast.hh"
+#include <vector>
 
 using namespace llvm;
 
@@ -20,7 +21,7 @@ struct LLVMCompiler {
     LLVMContext *context;
     IRBuilder<> builder;
     Module module;
-    std::unordered_map<std::string, AllocaInst*> locals;
+    std::unordered_map<std::string, std::vector<AllocaInst*>> locals;
     
     LLVMCompiler(LLVMContext *context, std::string file_name) : 
         context(context), builder(*context), module(file_name, *context) {}
