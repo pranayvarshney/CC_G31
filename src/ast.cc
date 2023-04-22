@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "symbol.hh"
+#include <iostream>
 
 int Node::get_type()
 {
@@ -73,6 +74,7 @@ NodeInt::NodeInt(long long int val)
 {
     type = INT_LIT;
     value = val;
+    std::cout<<"Value of int is "<<value<<std::endl;
 }
 
 std::string NodeInt::to_string()
@@ -168,7 +170,7 @@ std::string NodeIf::to_string() {
     return out;
 }
 
-NodeFunction::NodeFunction(std::string name, std::vector<std::pair<std::string, int>> args, int ret_type, NodeStmts *body)
+NodeFunction::NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body)
 {
     type = FUNCTION;
     function_name = name;
@@ -180,30 +182,27 @@ NodeFunction::NodeFunction(std::string name, std::vector<std::pair<std::string, 
 std::string NodeFunction::to_string()
 {
     std::string out = "Function " + function_name + "(";
-    for (auto arg : arguments)
-    {
-        out += arg.first + " : " + std::to_string(arg.second) + ", ";
-    }
-    out += ") -> " + std::to_string(return_type) + " " + function_body->to_string();
+    out+=arguments->to_string();
+    out += ") { " + function_body->to_string() + " }";
     return out;
 }
 
 NodeArgList::NodeArgList(){
     type = ARG_LIST;
-    list = std::vector<std::pair<std::string, int>>();
+    list = std::vector<NodeDecl *>();
 }
 
-void NodeArgList::push_back(std::string name, int dtype)
+void NodeArgList::push_back(NodeDecl* arg)
 {
-    list.push_back(std::make_pair(name, dtype));
+    list.push_back(arg);
 }
 std::string NodeArgList::to_string()
 {
     std::string out = "(";
     for (auto arg : list)
     {
-        out += arg.first + " : " + std::to_string(arg.second) + ", ";
+        out += " "+arg->to_string();
     }
-    out += ")";
+    out += " )";
     return out;
 }

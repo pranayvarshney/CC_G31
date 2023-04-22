@@ -34,7 +34,7 @@ src/$(PARSER).cc: src/$(PARSER).yy
 
 src/%_lex.cc: src/%.lex
 	@echo "Running flex..."
-	@echo "flex -o $@ $^"; flex -o $@ $^
+	@echo "flex -o $@ $^"; flex -d -o $@ $^
 
 clean:
 	@echo "Cleaning files..."
@@ -47,6 +47,10 @@ kunal:
 	@make compiler
 	@make program
 	@./bin/test test.be 
+
+rpj:
+	@make compiler
+	@./bin/base test.be -p
 
 $(BEBIN): obj/test.o obj/runtime_lib.o
 	@echo "Building executable..."

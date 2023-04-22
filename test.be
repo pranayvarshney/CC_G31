@@ -1,6 +1,3 @@
-let a : short = 1;
-if 1 {
+fun add(a : int, b :int) : int {
+ret a+b;
 }
-else {
-}
-dbg a;

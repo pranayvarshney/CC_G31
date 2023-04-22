@@ -37,10 +37,9 @@ int yyerror(std::string msg);
 %token TSCOL TLPAREN TRPAREN TEQUAL 
 %token IF ELSE LBRACE RBRACE TRET TFUN
 
-%type <node> Expr Stmt If_statement Function
-%type <stmts> Program StmtList Tail 
-%type <arglist> Arguments ArgumentList
-
+%type <node> Expr Stmt If_statement Function Return
+%type <stmts> Program StmtList Tail Function_body
+%type <arglist> ArgumentList Arguments
 %left TPLUS TDASH
 %left TSTAR TSLASH
 
@@ -55,6 +54,10 @@ Program :
 StmtList : If_statement
          { $$ = new NodeStmts(); $$->push_back($1); } 
          | StmtList If_statement
+         { $$->push_back($2); }
+         | Function
+         { $$ = new NodeStmts(); $$->push_back($1); }
+         | StmtList Function
          { $$->push_back($2); }
          | Stmt TSCOL           
          { $$ = new NodeStmts(); $$->push_back($1); }
@@ -76,41 +79,76 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      { 
         $$ = new NodeDebug($2);
      }
-     |
-     Function
-      ;
+     ;
 
-Function : TFUN TIDENT TLPAREN Arguments TRPAREN TCOLON TTYPE LBRACE StmtList TRET Expr RBRACE 
-    {
+Function : 
+     TFUN TIDENT Arguments TCOLON TTYPE LBRACE Function_body RBRACE{
         if(symbol_table_stack.contains($2)) {
-            // tried to redeclare variable, so error
             yyerror("tried to redeclare function.\n");
         } else {
-            // std::vector<std::pair<std::string, int>> args = $4;
-             symbol_table_stack.insert($2,type_table[$7]);
-            // $$ = new NodeFunction($2, args, type_table[$7], $9, $11);
+             symbol_table_stack.insert($2,type_table[$5]);
+             $$=new NodeFunction($2,$3,type_table[$5],$7);
+            
             }
-        
     }
 ;
 
-Arguments : ArgumentList
-    { $$ = $1; }
+
+Arguments : TLPAREN ArgumentList TRPAREN
+    {
+        $$ = $2;
+    }
+    | TLPAREN TRPAREN
+    { $$ = new NodeArgList(); }
+    ;
+
+ArgumentList :
+    TIDENT TCOLON TTYPE
+    {
+        if(symbol_table_stack.contains($1)) {
+            // tried to redeclare variable, so error
+            yyerror("tried to redeclare variable.\n");
+        } else {
+            symbol_table_stack.insert($1, type_table[$3]);
+            $$ = new NodeArgList();
+            $$->push_back(new NodeDecl($1, type_table[$3], new NodeInt(0), symbol_table_stack.getIdentifierOffset($1)));  
+        }
+    }
+    | ArgumentList TCOMMA TIDENT TCOLON TTYPE
+    {
+        if(symbol_table_stack.contains($3)) {
+            // tried to redeclare variable, so error
+            yyerror("tried to redeclare variable.\n");
+        } else {
+            symbol_table_stack.insert($3, type_table[$5]);
+            $$->push_back(new NodeDecl($3, type_table[$5], new NodeInt(0), symbol_table_stack.getIdentifierOffset($3)));  
+        }
+    }
+    ;
+Function_body: 
+     Return 
+     {
+        $$ = new NodeStmts();
+        $$->push_back($1);
+     }
+     | StmtList Return
+     {
+         $$ = $1;
+         $$->push_back($2);
+     }
+     | StmtList Return StmtList
+     {
+        $$ = $1;
+        $$->push_back($2);
+        $$->push_back($3);
+     }
+Return : TRET Expr TSCOL
+    {
+        $$ = $2;
+    }
     |
-    { $$ = nullptr; }
+    { $$ = new NodeInt(0); }
     ;
-
-ArgumentList : TIDENT TCOLON TTYPE TCOMMA ArgumentList
-    {
-        $$ = new NodeArgList();
-        $$->push_back($1, type_table[$3]);
-    }
-    | TIDENT TCOLON TTYPE
-    {
-        $$->push_back($1, type_table[$3]);
-    }
-    ;
-
 
 Tail: LBRACE StmtList RBRACE
      {

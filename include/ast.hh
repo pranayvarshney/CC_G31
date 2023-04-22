@@ -136,24 +136,25 @@ struct NodeIf : public Node
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
+struct NodeArgList : public Node
+{
+    NodeArgList();
+    void push_back(NodeDecl *node);
+    std::vector<NodeDecl *> list;
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
+};
 struct NodeFunction : public Node
 {
     std::string function_name;
-    std::vector<std::pair<std::string, int>> arguments;
+    NodeArgList *arguments;
     int return_type;
     NodeStmts *function_body;
-    NodeFunction(std::string name, std::vector<std::pair<std::string, int>> args, int ret_type, NodeStmts *body);
+
+    NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
 };
 
-struct NodeArgList : public Node
-{
-    NodeArgList();
-    void push_back(std::string name, int dtype);
-    std::vector<std::pair<std::string, int>> list;
-    std::string to_string();
-    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
-};
 
 #endif
