@@ -150,10 +150,10 @@ struct NodeFunction : public Node
     NodeArgList *arguments;
     int return_type;
     NodeStmts *function_body;
-
-    NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body);
+    int scope;
+    NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body,int s);
     std::string to_string();
-    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
 

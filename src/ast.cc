@@ -74,7 +74,6 @@ NodeInt::NodeInt(long long int val)
 {
     type = INT_LIT;
     value = val;
-    std::cout<<"Value of int is "<<value<<std::endl;
 }
 
 std::string NodeInt::to_string()
@@ -170,13 +169,14 @@ std::string NodeIf::to_string() {
     return out;
 }
 
-NodeFunction::NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body)
+NodeFunction::NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body, int s)
 {
     type = FUNCTION;
     function_name = name;
     arguments = args;
     return_type = ret_type;
     function_body = body;
+    scope = s;
 }
 
 std::string NodeFunction::to_string()
