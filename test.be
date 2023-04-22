@@ -1,3 +1,6 @@
 fun add(a : int, b :int) : int {
-ret a+b;
+    fun sub(a : int, b : int) : int {
+        ret a - b;
+    }
+    ret 1;
 }

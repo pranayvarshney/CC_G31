@@ -82,13 +82,17 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      ;
 
 Function : 
-     TFUN TIDENT Arguments TCOLON TTYPE LBRACE Function_body RBRACE{
+     TFUN TIDENT {
+        SymbolTable new_table;
+        symbol_table_stack.push(new_table);
+     }
+     Arguments TCOLON TTYPE LBRACE Function_body RBRACE{
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
-             symbol_table_stack.insert($2,type_table[$5]);
-             $$=new NodeFunction($2,$3,type_table[$5],$7);
-            
+             symbol_table_stack.insert($2,type_table[$6]);
+             $$=new NodeFunction($2,$4,type_table[$6],$8);
+             symbol_table_stack.pop();
             }
     }
 ;
