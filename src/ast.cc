@@ -181,20 +181,26 @@ NodeFunction::NodeFunction(std::string name, NodeArgList *args, int ret_type, No
 
 std::string NodeFunction::to_string()
 {
-    std::string out = "Function " + function_name + "(";
+    std::string out = "(Function " + function_name + "(";
     out+=arguments->to_string();
-    out += ") { " + function_body->to_string() + " }";
+    out += ") { " + function_body->to_string() + " } )";
     return out;
 }
 
 NodeArgList::NodeArgList(){
     type = ARG_LIST;
     list = std::vector<NodeDecl *>();
+    call = std::vector<NodeIdent *>();
 }
 
 void NodeArgList::push_back(NodeDecl* arg)
 {
     list.push_back(arg);
+}
+
+void NodeArgList::push_back_call(NodeIdent* arg)
+{
+    call.push_back(arg);
 }
 std::string NodeArgList::to_string()
 {
@@ -204,5 +210,21 @@ std::string NodeArgList::to_string()
         out += " "+arg->to_string();
     }
     out += " )";
+    return out;
+}
+
+NodeFunctionCall::NodeFunctionCall(std::string name, NodeArgList *args, int s)
+{
+    type = FCALL;
+    function_name = name;
+    arguments = args;
+    scope = s;
+}
+
+std::string NodeFunctionCall::to_string()
+{
+    std::string out = "(Function call " + function_name + "(";
+    out+=arguments->to_string();
+    out += ")";
     return out;
 }

@@ -306,4 +306,7 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
     return func;
 }
 
+Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler){
+    return nullptr;
+}
 #undef MAIN_FUNC

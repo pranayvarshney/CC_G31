@@ -37,9 +37,9 @@ int yyerror(std::string msg);
 %token TSCOL TLPAREN TRPAREN TEQUAL 
 %token IF ELSE LBRACE RBRACE TRET TFUN
 
-%type <node> Expr Stmt If_statement Function Return
+%type <node> Expr Stmt If_statement Function Return Function_call
 %type <stmts> Program StmtList Tail Function_body
-%type <arglist> ArgumentList Arguments
+%type <arglist> ArgumentList Arguments Function_call_arg Function_call_arg_list
 %left TPLUS TDASH
 %left TSTAR TSLASH
 
@@ -79,19 +79,22 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      { 
         $$ = new NodeDebug($2);
      }
+     | Function_call
+     {
+        $$ = $1;
+     }
      ;
 
 Function : 
-     TFUN TIDENT {
+     TFUN TIDENT Arguments TCOLON TTYPE{
+        symbol_table_stack.insert($2,type_table[$5]);
         SymbolTable new_table;
         symbol_table_stack.push(new_table);
-     }
-     Arguments TCOLON TTYPE LBRACE Function_body RBRACE{
+     } LBRACE Function_body RBRACE{
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
-             symbol_table_stack.insert($2,type_table[$6]);
-             $$=new NodeFunction($2,$4,type_table[$6],$8,symbol_table_stack.getIdentifierOffset($2));
+             $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
              symbol_table_stack.pop();
             }
     }
@@ -192,7 +195,8 @@ Expr : TINT_LIT
         else
             yyerror("using undeclared variable.\n");
      }
-     | Expr TPLUS Expr
+     | Function_call 
+     |Expr TPLUS Expr
      { 
         if($1->isIntLit() && $3->isIntLit()) {
             int val = dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue();
@@ -231,7 +235,41 @@ Expr : TINT_LIT
      | TLPAREN Expr TRPAREN { $$ = $2; }
      ;
 
-
+Function_call : TIDENT Function_call_arg
+    {
+        symbol_table_stack.currentScope();
+        if(symbol_table_stack.contains($1) || symbol_table_stack.parent_contains($1))
+            $$ = new NodeFunctionCall($1, $2,symbol_table_stack.getIdentifierOffset($1)); 
+        else
+            yyerror("Caliing undeclared function.\n");
+    }
+    ;
+Function_call_arg : TLPAREN Function_call_arg_list TRPAREN
+    {
+        $$ = $2;
+    }
+    | TLPAREN TRPAREN
+    {
+        $$ = new NodeArgList();
+    }
+    ;
+Function_call_arg_list: 
+    TIDENT
+    {
+        if(symbol_table_stack.contains($1) || symbol_table_stack.parent_contains($1)){
+            $$ = new NodeArgList();
+            $$->push_back_call(new NodeIdent($1, symbol_table_stack.getType($1),symbol_table_stack.getIdentifierOffset($1))); 
+        }
+        else
+            yyerror("using undeclared variable.\n");
+    }
+    | Function_call_arg_list TCOMMA TIDENT
+    {
+        if(symbol_table_stack.contains($3) || symbol_table_stack.parent_contains($3))
+            $$->push_back_call(new NodeIdent($3, symbol_table_stack.getType($3),symbol_table_stack.getIdentifierOffset($3))); 
+        else
+            yyerror("using undeclared variable.\n");
+    }
 %%
 
 int yyerror(std::string msg) {

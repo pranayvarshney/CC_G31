@@ -22,7 +22,8 @@ struct Node
         IDENT,
         IF,
         FUNCTION,
-        ARG_LIST
+        ARG_LIST,
+        FCALL
     } type;
 
     int dtype;
@@ -140,7 +141,9 @@ struct NodeArgList : public Node
 {
     NodeArgList();
     void push_back(NodeDecl *node);
+    void push_back_call(NodeIdent *node);
     std::vector<NodeDecl *> list;
+    std::vector<NodeIdent *> call;
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
 };
@@ -156,5 +159,14 @@ struct NodeFunction : public Node
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
 
+struct NodeFunctionCall : public Node
+{
+    std::string function_name;
+    NodeArgList *arguments;
+    int scope;
+    NodeFunctionCall(std::string name, NodeArgList *args,int s);
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+};
 
 #endif
