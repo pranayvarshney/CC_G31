@@ -1,7 +1,7 @@
-fun fib(n : int) : int {
+fun fib(n : int) : long {
     
     let i : short = 20;
-    dbg n;
+    dbg 4;
 
 }
 

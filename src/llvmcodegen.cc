@@ -386,6 +386,12 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
 
     if (Value *ret = function_body->llvm_codegen(compiler))
     {
+        if (return_type == 0)
+            ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt16Ty(), true);
+        else if (return_type == 1)
+            ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt32Ty(), true);
+        else if (return_type == 2)
+            ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt64Ty(), true);
         compiler->builder.CreateRet(ret);
     }
     else
