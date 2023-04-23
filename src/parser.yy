@@ -592,7 +592,19 @@ Function_call_arg : TLPAREN Function_call_arg_list TRPAREN
 Function_call_arg_list: 
     TINT_LIT{
         $$ = new NodeArgList();
-        $$->push_back_call(new NodeInt(std::stoll($1))); 
+        long long int ini = std::stoll($1);
+        if (ini >= -32768 && ini <= 32767)
+        {
+            $$->push_back_call(new NodeShort(short(ini)));
+        }
+        else if (ini >= -2147483648 && ini <= 2147483647)
+        {
+            $$->push_back_call(new NodeInt(int(ini)));
+        }
+        else
+        {
+            $$->push_back_call(new NodeLong(ini));
+        }
     }
     | TIDENT
     {
@@ -612,7 +624,19 @@ Function_call_arg_list:
     }
     | Function_call_arg_list TCOMMA TINT_LIT
     {
-        $$->push_back_call(new NodeInt(std::stoll($3))); 
+        long long int ini = std::stoll($3);
+        if (ini >= -32768 && ini <= 32767)
+        {
+            $$->push_back_call(new NodeShort(short(ini)));
+        }
+        else if (ini >= -2147483648 && ini <= 2147483647)
+        {
+            $$->push_back_call(new NodeInt(int(ini)));
+        }
+        else
+        {
+            $$->push_back_call(new NodeLong(ini));
+        }
     }
 %%
 

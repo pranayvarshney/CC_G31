@@ -29,7 +29,7 @@ extern int yyerror(std::string msg);
 "ret"     { return TRET; } 
 "int"|"long"|"short"       { yylval.lexeme = std::string(yytext); return TTYPE; }
 [0-9]+    { yylval.lexeme = std::string(yytext); return TINT_LIT; }
-[a-zA-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
+[a-z_A-Z]+ { yylval.lexeme = std::string(yytext); return TIDENT; }
 [ \t\n]   { /* skip */ }
 .         { yyerror("unknown char"); }
 
