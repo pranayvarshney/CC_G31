@@ -589,6 +589,7 @@ Function_call_arg : TLPAREN Function_call_arg_list TRPAREN
     }
     ;
 Function_call_arg_list: 
+
     TINT_LIT{
         $$ = new NodeArgList();
         long long int ini = std::stoll($1);
@@ -614,6 +615,12 @@ Function_call_arg_list:
         else
             yyerror("using undeclared variable.\n");
     }
+    |
+    Expr
+    {
+        $$ = new NodeArgList(); 
+        $$->push_back_call($1);
+    }
     | Function_call_arg_list TCOMMA TIDENT
     {
         if(symbol_table_stack.contains($3) || symbol_table_stack.parent_contains($3))
@@ -636,6 +643,11 @@ Function_call_arg_list:
         {
             $$->push_back_call(new NodeLong(ini));
         }
+    }
+    |
+    Function_call_arg_list TCOMMA Expr
+    { 
+        $$->push_back_call($3);
     }
 %%
 

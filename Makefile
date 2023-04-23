@@ -43,9 +43,7 @@ clean:
 program: $(BIN) $(BEBIN)
 
 kunal: 
-	@make clean
-	@make compiler
-	@make program
+	@make clean && make compiler -j12 && make program -j12
 	@./bin/test test.be 
 
 rpj:
