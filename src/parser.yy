@@ -38,7 +38,7 @@ int yyerror(std::string msg);
 %token IF ELSE LBRACE RBRACE TRET TFUN
 
 %type <node> Expr Stmt If_statement Function Return Function_call
-%type <stmts> Program StmtList Tail Function_body
+%type <stmts> Program StmtList Tail
 %type <arglist> ArgumentList Arguments Function_call_arg Function_call_arg_list
 %left TPLUS TDASH
 %left TSTAR TSLASH
@@ -98,7 +98,6 @@ Function :
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
-            symbol_table_stack.currentScope();
             $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
             symbol_table_stack.pop();
             std::string func_name = $2;
