@@ -165,22 +165,34 @@ Expr : TINT_LIT
      { 
         if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
-                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue());
+                
                 } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
-                   
-                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue();
                  }
                 else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
                    
-                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue();
                  }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3);
@@ -189,14 +201,27 @@ Expr : TINT_LIT
         else if($1->get_type()==1 || $3->get_type()==1){
             
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue();
+                }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
                 }
             } else {
                 // yyerror("here");
@@ -204,10 +229,21 @@ Expr : TINT_LIT
             }
         }
         else{
-           
              if($1->isIntLit() && $3->isIntLit()) {
-                short val = dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue();
-                $$ = new NodeShort(val);
+                long long int ini = 0;
+                ini = dynamic_cast<NodeShort*>($1)->getValue() + dynamic_cast<NodeShort*>($3)->getValue();
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 $$ = new NodeBinOp(NodeBinOp::PLUS, $1, $3);
             }
@@ -217,22 +253,34 @@ Expr : TINT_LIT
     { 
         if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
-                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                
                 } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
-                   
-                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue();
                  }
                 else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
                    
-                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue();
                  }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3);
@@ -241,14 +289,27 @@ Expr : TINT_LIT
         else if($1->get_type()==1 || $3->get_type()==1){
             
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue();
+                }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
                 }
             } else {
                 // yyerror("here");
@@ -256,10 +317,21 @@ Expr : TINT_LIT
             }
         }
         else{
-           
              if($1->isIntLit() && $3->isIntLit()) {
-                short val = dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue();
-                $$ = new NodeShort(val);
+                long long int ini = 0;
+                ini = dynamic_cast<NodeShort*>($1)->getValue() - dynamic_cast<NodeShort*>($3)->getValue();
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 $$ = new NodeBinOp(NodeBinOp::MINUS, $1, $3);
             }
@@ -269,22 +341,34 @@ Expr : TINT_LIT
       { 
         if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
-                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                
                 } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
-                   
-                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue();
                  }
                 else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
                    
-                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue();
                  }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3);
@@ -293,14 +377,27 @@ Expr : TINT_LIT
         else if($1->get_type()==1 || $3->get_type()==1){
             
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue();
+                }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
                 }
             } else {
                 // yyerror("here");
@@ -308,10 +405,21 @@ Expr : TINT_LIT
             }
         }
         else{
-           
              if($1->isIntLit() && $3->isIntLit()) {
-                short val = dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue();
-                $$ = new NodeShort(val);
+                long long int ini = 0;
+                ini = dynamic_cast<NodeShort*>($1)->getValue() * dynamic_cast<NodeShort*>($3)->getValue();
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 $$ = new NodeBinOp(NodeBinOp::MULT, $1, $3);
             }
@@ -321,22 +429,34 @@ Expr : TINT_LIT
        { 
         if($1->get_type()==2 ||$3->get_type()==2 ){
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeLong*>($3)) {
-                $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                
                 } else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeLong*>($3))) {
-                   
-                   $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeLong*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue();
                  }
                 else if ((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeLong*>($3))) {
                    
-                   $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue());
+                   ini = dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeLong*>($3)->getValue();
                 } 
                 else {
-                    $$ = new NodeLong(dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeLong*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue();
                  }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 //  yyerror("here");
                 $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3);
@@ -345,14 +465,27 @@ Expr : TINT_LIT
         else if($1->get_type()==1 || $3->get_type()==1){
             
             if($1->isIntLit() && $3->isIntLit()) {
+                long long int ini = 0;
                 if (dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeInt*>($3)) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if ((dynamic_cast<NodeShort*>($1) && dynamic_cast<NodeInt*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue());
+                    ini = dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeInt*>($3)->getValue();
                 } 
                 else if((dynamic_cast<NodeInt*>($1) && dynamic_cast<NodeShort*>($3))) {
-                    $$ = new NodeLong(dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue());
+                    ini = dynamic_cast<NodeInt*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue();
+                }
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
                 }
             } else {
                 // yyerror("here");
@@ -360,10 +493,21 @@ Expr : TINT_LIT
             }
         }
         else{
-           
              if($1->isIntLit() && $3->isIntLit()) {
-                short val = dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue();
-                $$ = new NodeShort(val);
+                long long int ini = 0;
+                ini = dynamic_cast<NodeShort*>($1)->getValue() / dynamic_cast<NodeShort*>($3)->getValue();
+                if (ini >= -32768 && ini <= 32767)
+                {
+                    $$ = new NodeShort(short(ini));
+                }
+                else if (ini >= -2147483648 && ini <= 2147483647)
+                {
+                    $$ = new NodeInt(int(ini));
+                }
+                else
+                {
+                    $$ = new NodeLong(ini);
+                }
             } else {
                 $$ = new NodeBinOp(NodeBinOp::DIV, $1, $3);
             }
