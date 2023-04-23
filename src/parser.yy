@@ -86,6 +86,7 @@ Stmt : TLET TIDENT TCOLON TTYPE TEQUAL Expr
      {
         $$ = $1;
      }
+     | Return
      ;
 
 Function : 
@@ -93,7 +94,7 @@ Function :
         symbol_table_stack.insert($2,type_table[$5]);
         SymbolTable new_table;
         symbol_table_stack.push(new_table);
-     } LBRACE Function_body RBRACE{
+     } LBRACE StmtList RBRACE{
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
@@ -153,7 +154,7 @@ Function_body:
         $$->push_back($2);
         $$->push_back($3);
      }
-Return : TRET Expr TSCOL
+Return : TRET Expr
     {
         $$ = $2;
     }

@@ -221,7 +221,7 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     else
         for (int i = compiler->locals[identifier].size(); i < scope; i++)
             compiler->locals[identifier].push_back(alloc);
-
+    std::cout<<"let "<<"identifier: "<<identifier<<" scope: "<<scope<<" size: "<<compiler->locals[identifier].size()<<std::endl;
     return compiler->builder.CreateStore(expr, alloc);
 }
 

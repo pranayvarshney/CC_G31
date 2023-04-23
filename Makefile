@@ -34,7 +34,7 @@ src/$(PARSER).cc: src/$(PARSER).yy
 
 src/%_lex.cc: src/%.lex
 	@echo "Running flex..."
-	@echo "flex -o -d $@ $^"; flex -o $@ $^
+	@echo "flex -o $@ $^"; flex -o $@ $^
 
 clean:
 	@echo "Cleaning files..."
