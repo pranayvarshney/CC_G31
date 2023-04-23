@@ -97,6 +97,7 @@ Function :
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
+             symbol_table_stack.currentScope();
              $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
              symbol_table_stack.pop();
             }

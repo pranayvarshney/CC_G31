@@ -1,16 +1,14 @@
-fun fib( a: int ,b:int  ) : int {
-
-    dbg a;
-    dbg b;
-
-    ret a;
-} 
+fun fib(n : int) : int {
+    dbg n;
+}
 
 fun main() : int {
-    if 1 {
-        dbg 1;
-    } else {
-        dbg 2;
+    let a :int = 1;
+    let b : int = 2;
+    if 0 {
+        dbg a;
     }
-    fib( 1 , 2);
+    else{
+        dbg b;
+    }
 }

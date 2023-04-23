@@ -219,13 +219,15 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     if (scope <= (int)compiler->locals[identifier].size())
         compiler->locals[identifier][scope - 1] = alloc;
     else
-        compiler->locals[identifier].push_back(alloc);
+        for (int i = compiler->locals[identifier].size(); i < scope; i++)
+            compiler->locals[identifier].push_back(alloc);
 
     return compiler->builder.CreateStore(expr, alloc);
 }
 
 Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
 {
+    std::cout<<"identifier: "<<identifier<<" scope: "<<scope<<" size: "<<compiler->locals[identifier].size()<<std::endl;
     AllocaInst *alloc = compiler->locals[identifier][scope - 1];
 
     // if your LLVM_MAJOR_VERSION >= 14
@@ -244,12 +246,16 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     Value *cond = condition->llvm_codegen(compiler);
     if (!cond)
         return nullptr;
-
+    cond = compiler->builder.CreateIntCast(
+        cond,
+        compiler->builder.getInt64Ty(),
+        true,
+        "ifcond");
     cond = compiler->builder.CreateICmpSLT(
         compiler->builder.getInt64(0),
         cond,
         "ifcond");
-
+    // compare condition to 0 of differernt types;
     Function *func = compiler->builder.GetInsertBlock()->getParent();
 
     BasicBlock *then_bb = BasicBlock::Create(*compiler->context, "then", func);
@@ -366,7 +372,8 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
         if (scope <= (int)compiler->locals[identifier].size())
             compiler->locals[identifier][scope - 1] = alloc;
         else
-            compiler->locals[identifier].push_back(alloc);
+            for (int i = compiler->locals[identifier].size(); i < scope; i++)
+                compiler->locals[identifier].push_back(alloc);
         compiler->builder.CreateStore(func->arg_begin() + Idx, alloc);
     }
 
