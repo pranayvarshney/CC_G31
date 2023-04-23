@@ -142,9 +142,8 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler)
         printi_func = compiler->module.getFunction("printi");
     }
 
-    compiler->builder.CreateCall(printi_func, {expr});
+    return compiler->builder.CreateCall(printi_func, {expr});
 
-    return expr;
 }
 
 Value *NodeShort::llvm_codegen(LLVMCompiler *compiler)
@@ -198,7 +197,6 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     Function *func = compiler->module.getFunction(func_name);
     if (!func)
     {
-        // Function not found, handle error
         return nullptr;
     }
 
@@ -233,14 +231,13 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     else
         for (int i = compiler->locals[identifier].size(); i < scope; i++)
             compiler->locals[identifier].push_back(alloc);
-    std::cout << "let "
-              << "identifier: " << identifier << " scope: " << scope << " size: " << compiler->locals[identifier].size() << std::endl;
+    
     return compiler->builder.CreateStore(expr, alloc);
 }
 
 Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
 {
-    std::cout << "identifier: " << identifier << " scope: " << scope << " size: " << compiler->locals[identifier].size() << std::endl;
+    
     AllocaInst *alloc = compiler->locals[identifier][scope - 1];
 
     // if your LLVM_MAJOR_VERSION >= 14
@@ -403,6 +400,19 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
             else if (return_type == 2)
                 ret = compiler->builder.getInt64(0);
         }
+        CallInst *print = dyn_cast<CallInst>(ret);
+        if(print)
+        {
+            Function *fn = print->getCalledFunction();
+            if(fn->getName() == "printi3" || fn->getName() == "printi2" || fn->getName() == "printi"){
+                if (return_type == 0)
+                    ret = compiler->builder.getInt16(0);
+                else if (return_type == 1)
+                    ret = compiler->builder.getInt32(0);
+                else if (return_type == 2)
+                    ret = compiler->builder.getInt64(0);
+            }
+        }
         else
         {
 
@@ -442,13 +452,20 @@ Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler)
     Function *func = compiler->module.getFunction(function_name);
 
     std::vector<Value *> args;
+    int i = 0;
     for (auto arg : arguments->call)
     {
-        args.push_back(arg->llvm_codegen(compiler));
+        Value *argValue = arg->llvm_codegen(compiler);
+        if(arg->type==Node::NodeType::INT_LIT)
+        {
+            argValue = compiler->builder.CreateIntCast(argValue,(func->arg_begin()+i)->getType(), true);
+        }
+        i++;
+        args.push_back(argValue);
     }
     std::string call_name = "call_" + function_name;
     Value *ret = compiler->builder.CreateCall(func, args, call_name);
     return ret;
-    
+
 }
 #undef MAIN_FUNC

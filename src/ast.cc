@@ -164,6 +164,7 @@ std::string NodeDebug::to_string()
 
 NodeIdent::NodeIdent(std::string ident, int t,int s)
 {
+    type = IDENT;
     identifier = ident;
     dtype = t;
     scope = s;
