@@ -184,10 +184,21 @@ If_statement :
         SymbolTable new_table;
         symbol_table_stack.push(new_table);
      }
-     Tail
+        Tail
      {
-        $$ = new NodeIf($2, $4,$8);
-        symbol_table_stack.pop();
+        if($2->isIntLit()){
+            if($2->to_string() != "0"){
+                $$ = $4;
+            }
+            else{
+                $$ = $8;
+            }
+            symbol_table_stack.pop();
+        }
+        else{
+            $$ = new NodeIf($2, $4,$8);
+            symbol_table_stack.pop();
+        }
      }
      ;
 

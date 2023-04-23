@@ -1,5 +1,4 @@
 fun fib(n : int) : int {
-    
     dbg n;
 }
 
