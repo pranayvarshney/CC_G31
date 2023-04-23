@@ -73,11 +73,20 @@ void LLVMCompiler::compile(Node *root)
         *context,
         "entry",
         main_func);
-
-    // move the builder to the start of the main function block
-    builder.SetInsertPoint(main_func_entry_bb);
-
-    root->llvm_codegen(this);
+    // generate code for the root node
+    for (auto node : dynamic_cast<NodeStmts *>(root)->list)
+    {
+        if (node->type == Node::NodeType::FUNCTION && dynamic_cast<NodeFunction *>(node)->function_name == "main")
+        {
+            // move the builder to the start of the main function block
+            builder.SetInsertPoint(main_func_entry_bb);
+            node->llvm_codegen(this);
+        }
+        else
+        {
+            node->llvm_codegen(this);
+        }
+    }
 
     // return 0;
     builder.CreateRet(builder.getInt32(0));
@@ -99,7 +108,7 @@ void LLVMCompiler::write(std::string file_name)
 
 //  ┌―――――――――――――――――――――┐  //
 //  │ AST -> LLVM Codegen │  //
-// └―――――――――――――――――――――┘   //
+//  └―――――――――――――――――――――┘   //
 
 // codegen for statements
 Value *NodeStmts::llvm_codegen(LLVMCompiler *compiler)
@@ -207,8 +216,8 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
    }
        
 
-    if(scope<=(int)compiler->locals[identifier].size())
-        compiler->locals[identifier][scope-1] = alloc;
+    if (scope <= (int)compiler->locals[identifier].size())
+        compiler->locals[identifier][scope - 1] = alloc;
     else
         compiler->locals[identifier].push_back(alloc);
 
@@ -217,7 +226,7 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
 
 Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
 {
-    AllocaInst *alloc = compiler->locals[identifier][scope-1];
+    AllocaInst *alloc = compiler->locals[identifier][scope - 1];
 
     // if your LLVM_MAJOR_VERSION >= 14
     if(this->dtype == 0){
@@ -253,11 +262,15 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
 
     Value *then_val = if_branch->llvm_codegen(compiler);
     if (!then_val)
-        return nullptr;
+    {
+        then_val = compiler->builder.getInt64(0);
+    }
 
     StoreInst *store = dyn_cast<StoreInst>(then_val);
     if (store)
         then_val = store->getValueOperand();
+
+    then_val = compiler->builder.CreateIntCast(then_val, compiler->builder.getInt64Ty(), true);
 
     compiler->builder.CreateBr(merge_bb);
     then_bb = compiler->builder.GetInsertBlock();
@@ -267,11 +280,15 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
 
     Value *else_val = else_branch->llvm_codegen(compiler);
     if (!else_val)
-        return nullptr;
+    {
+        else_val = compiler->builder.getInt64(0);
+    }
 
     StoreInst *store2 = dyn_cast<StoreInst>(else_val);
     if (store2)
         else_val = store2->getValueOperand();
+
+    else_val = compiler->builder.CreateIntCast(else_val, compiler->builder.getInt64Ty(), true);
 
     compiler->builder.CreateBr(merge_bb);
     else_bb = compiler->builder.GetInsertBlock();
@@ -280,7 +297,7 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     compiler->builder.SetInsertPoint(merge_bb);
 
     PHINode *phi_node = compiler->builder.CreatePHI(
-        compiler->builder.getInt64Ty(),
+        then_val->getType(),
         2,
         "iftmp");
 
@@ -290,4 +307,101 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     return phi_node;
 }
 
+Type *getIntType(int n, LLVMCompiler *compiler)
+{
+    switch (n)
+    {
+    case 0:
+        return Type::getInt16Ty(*compiler->context);
+    case 1:
+        return Type::getInt32Ty(*compiler->context);
+    case 2:
+        return Type::getInt64Ty(*compiler->context);
+    default:
+        llvm::errs() << "Invalid return_type: " << n << "\n";
+        return nullptr;
+    }
+}
+
+Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
+{
+    if (function_name == "main")
+    {
+        function_body->llvm_codegen(compiler);
+        return nullptr;
+    }
+    std::vector<Type *> args_type;
+
+    for (auto arg : arguments->list)
+    {
+        args_type.push_back(getIntType(arg->dtype, compiler));
+    }
+
+    Type *ReturnType = getIntType(return_type, compiler);
+    FunctionType *func_type = FunctionType::get(ReturnType, args_type, false);
+
+    Function *func = Function::Create(
+        func_type,
+        Function::ExternalLinkage,
+        function_name,
+        compiler->module);
+
+    unsigned Idx = 0;
+    for (Function::arg_iterator arg = func->arg_begin(); arg != func->arg_end(); ++arg, ++Idx)
+    {
+        std::string arg_name = dynamic_cast<NodeIdent *>(arguments->list[Idx])->identifier;
+        arg->setName(arg_name);
+    }
+
+    BasicBlock *bb = BasicBlock::Create(*compiler->context, "entry", func);
+    compiler->builder.SetInsertPoint(bb);
+    IRBuilder<> temp_builder(
+        &func->getEntryBlock(),
+        func->getEntryBlock().begin());
+    Idx=0;
+    for (Function::arg_iterator arg = func->arg_begin(); arg != func->arg_end(); ++arg, ++Idx)
+    {
+        std::string identifier = dynamic_cast<NodeIdent *>(arguments->list[Idx])->identifier;
+        AllocaInst *alloc = temp_builder.CreateAlloca(getIntType(arguments->list[Idx]->dtype, compiler), 0, identifier);
+        if (scope <= (int)compiler->locals[identifier].size())
+            compiler->locals[identifier][scope - 1] = alloc;
+        else
+            compiler->locals[identifier].push_back(alloc);
+        compiler->builder.CreateStore(func->arg_begin() + Idx, alloc);
+    }
+
+    if (Value *ret = function_body->llvm_codegen(compiler))
+    {
+        compiler->builder.CreateRet(ret);
+    }
+    else
+    {
+        switch (return_type)
+        {
+        case 0:
+            compiler->builder.CreateRet(compiler->builder.getInt16(0));
+        case 1:
+            compiler->builder.CreateRet(compiler->builder.getInt32(0));
+        case 2:
+            compiler->builder.CreateRet(compiler->builder.getInt64(0));
+        default:
+            compiler->builder.CreateRet(compiler->builder.getInt64(0));
+        }
+    }
+    return func;
+}
+
+Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler){
+    Function *func = compiler->module.getFunction(function_name);
+    
+    std::vector<Value *> args;
+    for (auto arg : arguments->call)
+    {
+        args.push_back(arg->llvm_codegen(compiler));
+    }
+    std::string call_name = "call_" + function_name;
+    Value *ret = compiler->builder.CreateCall(func, args, call_name);
+    return ret;
+    // return nullptr;
+}
 #undef MAIN_FUNC

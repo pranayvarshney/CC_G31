@@ -1,6 +1,16 @@
-let a : long = 32000*768;
-let b : int = 2147483647;
-let c : long = 2147483649+2147483647;
-dbg a;
-dbg b;
-dbg c;
+fun fib( a: int ,b:int  ) : int {
+
+    dbg a;
+    dbg b;
+
+    ret a;
+} 
+
+fun main() : int {
+    if 1 {
+        dbg 1;
+    } else {
+        dbg 2;
+    }
+    fib( 1 , 2);
+}

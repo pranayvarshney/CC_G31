@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "symbol.hh"
+#include <iostream>
 
 int Node::get_type()
 {
@@ -193,42 +194,62 @@ std::string NodeIf::to_string() {
     return out;
 }
 
-NodeFunction::NodeFunction(std::string name, std::vector<std::pair<std::string, int>> args, int ret_type, NodeStmts *body)
+NodeFunction::NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body, int s)
 {
     type = FUNCTION;
     function_name = name;
     arguments = args;
     return_type = ret_type;
     function_body = body;
+    scope = s;
 }
 
 std::string NodeFunction::to_string()
 {
-    std::string out = "Function " + function_name + "(";
-    for (auto arg : arguments)
-    {
-        out += arg.first + " : " + std::to_string(arg.second) + ", ";
-    }
-    out += ") -> " + std::to_string(return_type) + " " + function_body->to_string();
+    std::string out = "(Function " + function_name + "(";
+    out+=arguments->to_string();
+    out += ") { " + function_body->to_string() + " } )";
     return out;
 }
 
 NodeArgList::NodeArgList(){
     type = ARG_LIST;
-    list = std::vector<std::pair<std::string, int>>();
+    list = std::vector<Node *>();
+    call = std::vector<Node *>();
 }
 
-void NodeArgList::push_back(std::string name, int dtype)
+void NodeArgList::push_back(Node* arg)
 {
-    list.push_back(std::make_pair(name, dtype));
+    list.push_back(arg);
+}
+
+void NodeArgList::push_back_call(Node* arg)
+{
+    call.push_back(arg);
 }
 std::string NodeArgList::to_string()
 {
     std::string out = "(";
     for (auto arg : list)
     {
-        out += arg.first + " : " + std::to_string(arg.second) + ", ";
+        out += " "+arg->to_string();
     }
+    out += " )";
+    return out;
+}
+
+NodeFunctionCall::NodeFunctionCall(std::string name, NodeArgList *args, int s)
+{
+    type = FCALL;
+    function_name = name;
+    arguments = args;
+    scope = s;
+}
+
+std::string NodeFunctionCall::to_string()
+{
+    std::string out = "(Function call " + function_name + "(";
+    out+=arguments->to_string();
     out += ")";
     return out;
 }

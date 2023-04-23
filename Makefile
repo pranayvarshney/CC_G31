@@ -48,6 +48,10 @@ kunal:
 	@make program -j12
 	@./bin/test test.be 
 
+rpj:
+	@make compiler
+	@./bin/base test.be -p
+
 $(BEBIN): obj/test.o obj/runtime_lib.o
 	@echo "Building executable..."
 	@echo "clang++ obj/test.o obj/runtime_lib.o -o $(BEBIN)"; clang++ obj/test.o obj/runtime_lib.o -o $(BEBIN)
