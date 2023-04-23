@@ -386,6 +386,10 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
 
     if (Value *ret = function_body->llvm_codegen(compiler))
     {
+        if (ReturnType->getIntegerBitWidth() < ret->getType()->getIntegerBitWidth()){
+            perror("Return type mismatch");
+            exit(1);
+        }
         if (return_type == 0)
             ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt16Ty(), true);
         else if (return_type == 1)
