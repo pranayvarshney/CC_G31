@@ -1,5 +1,5 @@
 fun f(a : short ) : int {
-    let b : long = 1;
+    dbg 3;
 }
 fun main() : int {
     dbg f(1);

@@ -142,9 +142,8 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler)
         printi_func = compiler->module.getFunction("printi");
     }
 
-    compiler->builder.CreateCall(printi_func, {expr});
+    return compiler->builder.CreateCall(printi_func, {expr});
 
-    return expr;
 }
 
 Value *NodeShort::llvm_codegen(LLVMCompiler *compiler)
@@ -400,6 +399,19 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
                 ret = compiler->builder.getInt32(0);
             else if (return_type == 2)
                 ret = compiler->builder.getInt64(0);
+        }
+        CallInst *print = dyn_cast<CallInst>(ret);
+        if(print)
+        {
+            Function *fn = print->getCalledFunction();
+            if(fn->getName() == "printi3" || fn->getName() == "printi2" || fn->getName() == "printi"){
+                if (return_type == 0)
+                    ret = compiler->builder.getInt16(0);
+                else if (return_type == 1)
+                    ret = compiler->builder.getInt32(0);
+                else if (return_type == 2)
+                    ret = compiler->builder.getInt64(0);
+            }
         }
         else
         {
