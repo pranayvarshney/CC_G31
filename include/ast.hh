@@ -33,7 +33,7 @@ struct Node
     virtual llvm::Value *llvm_codegen(LLVMCompiler *compiler) = 0;
     std::string nameOfVariable;
     virtual int get_type();
-    void set_type(int i) {dtype = i;};
+    void set_type(int i) { dtype = i; };
 };
 
 /**
@@ -81,9 +81,8 @@ struct NodeShort : public Node
     short getValue() const { return value; }
     virtual bool isIntLit() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
-    int get_type(){return 0;};
+    int get_type() { return 0; };
 };
-
 
 struct NodeInt : public Node
 {
@@ -114,10 +113,13 @@ struct NodeDecl : public Node
 {
     std::string identifier;
     Node *expression;
-    NodeDecl(std::string id, int t, Node *expr,int s);
+    NodeDecl(std::string id, int t, Node *expr, int s);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
     int scope;
+    std::string func_name = "main";
+    void set_func_name(std::string k);
+   
 };
 
 /**
@@ -139,7 +141,7 @@ struct NodeIdent : public Node
 {
     std::string identifier;
 
-    NodeIdent(std::string ident, int t,int s);
+    NodeIdent(std::string ident, int t, int s);
     std::string to_string();
     virtual bool isIdent() const { return true; }
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
@@ -168,7 +170,7 @@ struct NodeArgList : public Node
     std::vector<Node *> list;
     std::vector<Node *> call;
     std::string to_string();
-    llvm::Value *llvm_codegen(LLVMCompiler *compiler){return nullptr;};
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler) { return nullptr; };
 };
 struct NodeFunction : public Node
 {
@@ -177,7 +179,7 @@ struct NodeFunction : public Node
     int return_type;
     NodeStmts *function_body;
     int scope;
-    NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body,int s);
+    NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body, int s);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
@@ -187,7 +189,7 @@ struct NodeFunctionCall : public Node
     std::string function_name;
     NodeArgList *arguments;
     int scope;
-    NodeFunctionCall(std::string name, NodeArgList *args,int s);
+    NodeFunctionCall(std::string name, NodeArgList *args, int s);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };

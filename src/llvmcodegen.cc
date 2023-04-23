@@ -190,9 +190,16 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     Value *expr = expression->llvm_codegen(compiler);
     Type* expr_type = expr->getType();
 
+    Function *func = compiler->module.getFunction(func_name);
+    if (!func)
+    {
+        // Function not found, handle error
+        return nullptr;
+    }
+
     IRBuilder<> temp_builder(
-        &MAIN_FUNC->getEntryBlock(),
-        MAIN_FUNC->getEntryBlock().begin());
+        &func->getEntryBlock(),
+        func->getEntryBlock().begin());
     AllocaInst *alloc;
     if (this->dtype == 0)
     {

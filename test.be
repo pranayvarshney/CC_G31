@@ -1,6 +1,8 @@
 fun fib(n : int) : int {
     
+    let i : short = 20;
     dbg n;
+
 }
 
 fun main() : int {
@@ -14,4 +16,5 @@ fun main() : int {
     else{
         dbg b;
     }
+    ret 20;
 }

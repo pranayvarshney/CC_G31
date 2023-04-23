@@ -98,10 +98,17 @@ Function :
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
-             symbol_table_stack.currentScope();
-             $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
-             symbol_table_stack.pop();
+            symbol_table_stack.currentScope();
+            $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
+            symbol_table_stack.pop();
+            std::string func_name = $2;
+            for (auto stmt : $8->list) {
+                auto decl = dynamic_cast<NodeDecl*>(stmt);
+                if (decl) {
+                    decl->set_func_name(func_name);
+                }
             }
+        }
     }
 ;
 
@@ -137,23 +144,7 @@ ArgumentList :
         }
     }
     ;
-Function_body: 
-     Return 
-     {
-        $$ = new NodeStmts();
-        $$->push_back($1);
-     }
-     | StmtList Return
-     {
-         $$ = $1;
-         $$->push_back($2);
-     }
-     | StmtList Return StmtList
-     {
-        $$ = $1;
-        $$->push_back($2);
-        $$->push_back($3);
-     }
+
 Return : TRET Expr
     {
         $$ = $2;

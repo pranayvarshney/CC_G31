@@ -143,7 +143,9 @@ NodeDecl::NodeDecl(std::string id, int t, Node *expr,int s)
     nameOfVariable = id;
     scope = s;
 }
-
+void NodeDecl::set_func_name(std::string se ){
+    this->func_name = se;
+}
 std::string NodeDecl::to_string()
 {
     return "(let " + identifier + " " + expression->to_string() + ")";
