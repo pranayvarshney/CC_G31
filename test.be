@@ -1,10 +1,6 @@
-fun add_if_a_is_one_else_sub(a : int, b : int) : long {
-if a - 1 {
-ret a - b;
-} else {
-ret a + b;
-}
+fun f(a : short ) : int {
+    let b : long = 1;
 }
 fun main() : int {
-    dbg 4/0;
+    dbg f(1);
 }
