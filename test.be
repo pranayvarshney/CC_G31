@@ -1,8 +1,17 @@
-fun f(a : short , j : short) : int {
-    let b : long = 1;
-    dbg a+j ;
+fun f(a:int) : int{
+    if a {
+        let b : short = 2;
+        ret 1;
+    } else {
+        ret 2;
+    }
 }
+
 fun main() : int {
     let k : short = 2;
-    dbg f(4, 1+k);
+    if k {
+        dbg f(1);
+    } else {
+        dbg 2;
+    }
 }

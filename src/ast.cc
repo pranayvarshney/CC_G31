@@ -214,6 +214,10 @@ std::string NodeFunction::to_string()
     out += ") { " + function_body->to_string() + " } )";
     return out;
 }
+void NodeFunction::add_return(Node *ret){
+    this->function_body->push_back(ret);
+}
+
 
 NodeArgList::NodeArgList(){
     type = ARG_LIST;
@@ -255,4 +259,15 @@ std::string NodeFunctionCall::to_string()
     out+=arguments->to_string();
     out += ")";
     return out;
+}
+
+NodeFunctionReturn::NodeFunctionReturn(Node *expr)
+{
+    type = FRET;
+    expression = expr;
+}
+
+std::string NodeFunctionReturn::to_string()
+{
+    return "(ret " + expression->to_string() + ")";
 }

@@ -25,7 +25,7 @@ void LLVMCompiler::compile(Node *root)
     /* Adding reference to print_i in the runtime library */
     // void printi();
     FunctionType *printi_func_type = FunctionType::get(
-        builder.getVoidTy(),
+        builder.getInt64Ty(),
         {builder.getInt64Ty()},
         false);
     Function::Create(
@@ -35,7 +35,7 @@ void LLVMCompiler::compile(Node *root)
         &module);
 
     FunctionType *printi_func_type1 = FunctionType::get(
-        builder.getVoidTy(),
+        builder.getInt32Ty(),
         {builder.getInt32Ty()},
         false);
     Function::Create(
@@ -45,7 +45,7 @@ void LLVMCompiler::compile(Node *root)
         &module);
 
     FunctionType *printi_func_type2 = FunctionType::get(
-        builder.getVoidTy(),
+        builder.getInt16Ty(),
         {builder.getInt16Ty()},
         false);
     Function::Create(
@@ -89,7 +89,7 @@ void LLVMCompiler::compile(Node *root)
     }
 
     // return 0;
-    builder.CreateRet(builder.getInt32(0));
+    // builder.CreateRet(builder.getInt32(0));
 }
 
 void LLVMCompiler::dump()
@@ -143,7 +143,6 @@ Value *NodeDebug::llvm_codegen(LLVMCompiler *compiler)
     }
 
     return compiler->builder.CreateCall(printi_func, {expr});
-
 }
 
 Value *NodeShort::llvm_codegen(LLVMCompiler *compiler)
@@ -231,13 +230,13 @@ Value *NodeDecl::llvm_codegen(LLVMCompiler *compiler)
     else
         for (int i = compiler->locals[identifier].size(); i < scope; i++)
             compiler->locals[identifier].push_back(alloc);
-    
+
     return compiler->builder.CreateStore(expr, alloc);
 }
 
 Value *NodeIdent::llvm_codegen(LLVMCompiler *compiler)
 {
-    
+
     AllocaInst *alloc = compiler->locals[identifier][scope - 1];
 
     // if your LLVM_MAJOR_VERSION >= 14
@@ -287,7 +286,12 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     if (store)
         then_val = store->getValueOperand();
 
-    then_val = compiler->builder.CreateIntCast(then_val, compiler->builder.getInt64Ty(), true);
+    ReturnInst *ret = dyn_cast<ReturnInst>(then_val);
+    then_val->print(llvm::outs());
+    if (!ret)
+    {
+        then_val = compiler->builder.CreateIntCast(then_val, compiler->builder.getInt64Ty(), true);
+    }
 
     compiler->builder.CreateBr(merge_bb);
     then_bb = compiler->builder.GetInsertBlock();
@@ -305,7 +309,11 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
     if (store2)
         else_val = store2->getValueOperand();
 
-    else_val = compiler->builder.CreateIntCast(else_val, compiler->builder.getInt64Ty(), true);
+    ReturnInst *ret2 = dyn_cast<ReturnInst>(else_val);
+    if (!ret2)
+    {
+        else_val = compiler->builder.CreateIntCast(else_val, compiler->builder.getInt64Ty(), true);
+    }
 
     compiler->builder.CreateBr(merge_bb);
     else_bb = compiler->builder.GetInsertBlock();
@@ -317,9 +325,22 @@ Value *NodeIf::llvm_codegen(LLVMCompiler *compiler)
         then_val->getType(),
         2,
         "iftmp");
-
-    phi_node->addIncoming(then_val, then_bb);
-    phi_node->addIncoming(else_val, else_bb);
+    if (ret)
+    {
+        phi_node->addIncoming(compiler->builder.CreateRet(then_val), then_bb);
+    }
+    else
+    {
+        phi_node->addIncoming(then_val, then_bb);
+    }
+    if (ret2)
+    {
+        phi_node->addIncoming(compiler->builder.CreateRet(else_val), then_bb);
+    }
+    else
+    {
+        phi_node->addIncoming(else_val, else_bb);
+    }
 
     return phi_node;
 }
@@ -390,45 +411,48 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
 
     if (Value *ret = function_body->llvm_codegen(compiler))
     {
-        StoreInst *store = dyn_cast<StoreInst>(ret);
-        if (store)
-        {
-            if (return_type == 0)
-                ret = compiler->builder.getInt16(0);
-            else if (return_type == 1)
-                ret = compiler->builder.getInt32(0);
-            else if (return_type == 2)
-                ret = compiler->builder.getInt64(0);
-        }
-        CallInst *print = dyn_cast<CallInst>(ret);
-        if(print)
-        {
-            Function *fn = print->getCalledFunction();
-            if(fn->getName() == "printi3" || fn->getName() == "printi2" || fn->getName() == "printi"){
-                if (return_type == 0)
-                    ret = compiler->builder.getInt16(0);
-                else if (return_type == 1)
-                    ret = compiler->builder.getInt32(0);
-                else if (return_type == 2)
-                    ret = compiler->builder.getInt64(0);
-            }
-        }
-        else
-        {
+        // StoreInst *store = dyn_cast<StoreInst>(ret);
+        // if (store)
+        // {
+        //     if (return_type == 0)
+        //         ret = compiler->builder.getInt16(0);
+        //     else if (return_type == 1)
+        //         ret = compiler->builder.getInt32(0);
+        //     else if (return_type == 2)
+        //         ret = compiler->builder.getInt64(0);
+        // }
+        // CallInst *print = dyn_cast<CallInst>(ret);
+        // if(print)
+        // {
+        //     Function *fn = print->getCalledFunction();
+        //     if(fn->getName() == "printi3" || fn->getName() == "printi2" || fn->getName() == "printi"){
+        //         if (return_type == 0)
+        //             ret = compiler->builder.getInt16(0);
+        //         else if (return_type == 1)
+        //             ret = compiler->builder.getInt32(0);
+        //         else if (return_type == 2)
+        //             ret = compiler->builder.getInt64(0);
+        //     }
+        // }
+        // else
+        // {
 
-            if (ReturnType->getIntegerBitWidth() < ret->getType()->getIntegerBitWidth())
-            {
-                perror("Return type mismatch");
-                exit(1);
-            }
-            if (return_type == 0)
-                ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt16Ty(), true);
-            else if (return_type == 1)
-                ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt32Ty(), true);
-            else if (return_type == 2)
-                ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt64Ty(), true);
-        }
-        compiler->builder.CreateRet(ret);
+        //     if (ReturnType->getIntegerBitWidth() < ret->getType()->getIntegerBitWidth())
+        //     {
+        //         perror("Return type mismatch");
+        //         exit(1);
+        //     }
+        //     if (return_type == 0)
+        //         ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt16Ty(), true);
+        //     else if (return_type == 1)
+        //         ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt32Ty(), true);
+        //     else if (return_type == 2)
+        //         ret = compiler->builder.CreateIntCast(ret, compiler->builder.getInt64Ty(), true);
+        // }
+        // if(auto *phi = dyn_cast<PHINode>(ret)){
+        //     std::cout<<"phi node\n";
+        //     compiler->builder.CreateRet(ret);
+        // }
     }
     else
     {
@@ -447,6 +471,12 @@ Value *NodeFunction::llvm_codegen(LLVMCompiler *compiler)
     return func;
 }
 
+Value *NodeFunctionReturn::llvm_codegen(LLVMCompiler *compiler)
+{
+    Value *ret = expression->llvm_codegen(compiler);
+    return compiler->builder.CreateRet(ret);
+}
+
 Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler)
 {
     Function *func = compiler->module.getFunction(function_name);
@@ -456,9 +486,9 @@ Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler)
     for (auto arg : arguments->call)
     {
         Value *argValue = arg->llvm_codegen(compiler);
-        if(arg->type==Node::NodeType::INT_LIT)
+        if (arg->type == Node::NodeType::INT_LIT)
         {
-            argValue = compiler->builder.CreateIntCast(argValue,(func->arg_begin()+i)->getType(), true);
+            argValue = compiler->builder.CreateIntCast(argValue, (func->arg_begin() + i)->getType(), true);
         }
         i++;
         args.push_back(argValue);
@@ -466,6 +496,5 @@ Value *NodeFunctionCall::llvm_codegen(LLVMCompiler *compiler)
     std::string call_name = "call_" + function_name;
     Value *ret = compiler->builder.CreateCall(func, args, call_name);
     return ret;
-
 }
 #undef MAIN_FUNC

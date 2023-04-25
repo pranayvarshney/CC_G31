@@ -23,7 +23,8 @@ struct Node
         IF,
         FUNCTION,
         ARG_LIST,
-        FCALL
+        FCALL,
+        FRET
     } type;
 
     int dtype;
@@ -180,6 +181,7 @@ struct NodeFunction : public Node
     NodeStmts *function_body;
     int scope;
     NodeFunction(std::string name, NodeArgList *args, int ret_type, NodeStmts *body, int s);
+    void add_return(Node *expr);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };
@@ -190,6 +192,14 @@ struct NodeFunctionCall : public Node
     NodeArgList *arguments;
     int scope;
     NodeFunctionCall(std::string name, NodeArgList *args, int s);
+    std::string to_string();
+    llvm::Value *llvm_codegen(LLVMCompiler *compiler);
+};
+
+struct NodeFunctionReturn : public Node
+{
+    Node *expression;
+    NodeFunctionReturn(Node *expr);
     std::string to_string();
     llvm::Value *llvm_codegen(LLVMCompiler *compiler);
 };

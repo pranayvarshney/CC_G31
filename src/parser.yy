@@ -98,15 +98,32 @@ Function :
         if(symbol_table_stack.contains($2)) {
             yyerror("tried to redeclare function.\n");
         } else {
-            $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
-            symbol_table_stack.pop();
+        
             std::string func_name = $2;
+            bool ret_check = false;
             for (auto stmt : $8->list) {
                 auto decl = dynamic_cast<NodeDecl*>(stmt);
                 if (decl) {
                     decl->set_func_name(func_name);
                 }
+                auto ret = dynamic_cast<NodeFunctionReturn*>(stmt);
+                if (ret) {
+                    ret_check = true;
+                }
             }
+            if (!ret_check) {
+                if(type_table[$5]==0){
+                    $8->list.push_back(new NodeFunctionReturn(new NodeShort(0)));
+                }
+                else if(type_table[$5]==1){
+                    $8->list.push_back(new NodeFunctionReturn(new NodeInt(0)));
+                }
+                else{
+                    $8->list.push_back(new NodeFunctionReturn(new NodeLong(0)));
+                }
+            }
+            $$=new NodeFunction($2,$3,type_table[$5],$8,symbol_table_stack.getIdentifierOffset($2));
+            symbol_table_stack.pop();
         }
     }
 ;
@@ -146,10 +163,8 @@ ArgumentList :
 
 Return : TRET Expr
     {
-        $$ = $2;
+        $$ = new NodeFunctionReturn($2);
     }
-    |
-    { $$ = new NodeInt(0); }
     ;
 
 Tail: LBRACE StmtList RBRACE
